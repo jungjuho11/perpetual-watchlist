@@ -1,103 +1,81 @@
-import Image from "next/image";
+'use client';
+
+import { Container, Typography, Box, Alert } from '@mui/material';
+import SearchBar from '../components/SearchBar';
+import { SearchResultItem } from './api/search/route';
+import { useState } from 'react';
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [notification, setNotification] = useState<string | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const handleAddToWatchlist = async (item: SearchResultItem) => {
+    try {
+      const response = await fetch('/api/watchlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tmdbId: item.id,
+          mediaType: item.mediaType,
+          title: item.title,
+          overview: item.overview,
+          posterUrl: item.posterUrl,
+          releaseDate: item.releaseDate,
+          rating: item.rating,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setNotification(`Added "${item.title}" to your watchlist!`);
+      } else if (response.status === 409) {
+        setNotification(`"${item.title}" is already in your watchlist!`);
+      } else {
+        throw new Error(data.error || 'Failed to add to watchlist');
+      }
+      
+      // Clear notification after 3 seconds
+      setTimeout(() => setNotification(null), 3000);
+    } catch (error) {
+      console.error('Failed to add to watchlist:', error);
+      setNotification('Failed to add item to watchlist');
+      setTimeout(() => setNotification(null), 3000);
+    }
+  };
+
+  return (
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Box sx={{ textAlign: 'center', mb: 6 }}>
+        <Typography variant="h2" component="h1" gutterBottom>
+          Perpetual Watchlist
+        </Typography>
+        <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
+          Track movies and TV shows you want to watch
+        </Typography>
+        
+        {notification && (
+          <Alert 
+            severity="success" 
+            sx={{ mb: 3, maxWidth: 600, mx: 'auto' }}
+            onClose={() => setNotification(null)}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+            {notification}
+          </Alert>
+        )}
+        
+        <SearchBar onAddToWatchlist={handleAddToWatchlist} />
+      </Box>
+      
+      <Box sx={{ mt: 6, textAlign: 'center' }}>
+        <Typography variant="body1" color="text.secondary">
+          Search for movies and TV shows above to add them to your watchlist.
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+          Your watchlist and viewing history will be saved automatically.
+        </Typography>
+      </Box>
+    </Container>
   );
 }
