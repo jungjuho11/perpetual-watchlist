@@ -17,12 +17,14 @@ datasource db {
 model WatchlistItem {
   id            Int      @id @default(autoincrement())
   tmdbId        Int
+  title         String?
+  posterImage   String?
   mediaType     String   // 'movie' or 'tv'
   watched       Boolean  @default(false)
   dateWatched   DateTime?
   dateAdded     DateTime @default(now())
   userRating    Int?
   priority      Int?
-  favorite      Boolean
+  favorite      Boolean @default(false)
   recommendedBy String?
 }
