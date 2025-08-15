@@ -1,7 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+// Global variable to cache the Prisma client instance
+declare global {
+  var prisma: PrismaClient | undefined;
+}
+
+const prisma = globalThis.prisma || new PrismaClient();
+
+if (process.env.NODE_ENV !== 'production') {
+  globalThis.prisma = prisma;
+}
 
 export async function POST(request: NextRequest) {
   try {
