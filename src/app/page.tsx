@@ -1,12 +1,14 @@
 'use client';
 
-import { Container, Typography, Box, Alert } from '@mui/material';
+import { Container, Typography, Box, Alert, Divider } from '@mui/material';
 import SearchBar from '../components/SearchBar';
+import WatchlistTable from '../components/WatchlistTable';
 import { SearchResultItem } from './api/search/route';
 import { useState } from 'react';
 
 export default function Home() {
   const [notification, setNotification] = useState<string | null>(null);
+  const [refreshTable, setRefreshTable] = useState(0);
 
   const handleAddToWatchlist = async (item: SearchResultItem) => {
     try {
@@ -30,6 +32,7 @@ export default function Home() {
 
       if (response.ok) {
         setNotification(`Added "${item.title}" to your watchlist!`);
+        setRefreshTable(prev => prev + 1); // Trigger table refresh
       } else if (response.status === 409) {
         setNotification(`"${item.title}" is already in your watchlist!`);
       } else {
@@ -68,12 +71,14 @@ export default function Home() {
         <SearchBar onAddToWatchlist={handleAddToWatchlist} />
       </Box>
       
+      <Divider sx={{ my: 4 }} />
+      
+      {/* Watchlist Table */}
+      <WatchlistTable key={refreshTable} onRefresh={() => setRefreshTable(prev => prev + 1)} />
+      
       <Box sx={{ mt: 6, textAlign: 'center' }}>
-        <Typography variant="body1" color="text.secondary">
+        <Typography variant="body2" color="text.secondary">
           Search for movies and TV shows above to add them to your watchlist.
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          Your watchlist and viewing history will be saved automatically.
         </Typography>
       </Box>
     </Container>
