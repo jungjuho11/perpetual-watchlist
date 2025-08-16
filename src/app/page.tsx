@@ -51,8 +51,8 @@ export default function Home() {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ textAlign: 'center', mb: 6 }}>
+    <Container maxWidth="xl" sx={{ py: 2, px: { xs: 2, sm: 3, md: 4 } }}>
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Box /> {/* Spacer */}
           <Typography variant="h2" component="h1">
@@ -70,7 +70,7 @@ export default function Home() {
         <SearchBar onAddToWatchlist={handleAddToWatchlist} />
       </Box>
       
-      <Divider sx={{ my: 4 }} />
+      <Divider sx={{ my: 3 }} />
       
       {/* Watchlist Table */}
       <WatchlistTable 

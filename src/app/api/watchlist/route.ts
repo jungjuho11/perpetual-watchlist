@@ -12,6 +12,7 @@ if (process.env.NODE_ENV !== 'production') {
   globalThis.prisma = prisma;
 }
 
+// add movie or tv show to watchlist
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -47,6 +48,7 @@ export async function POST(request: NextRequest) {
         mediaType,
         watched: false,
         favorite: false,
+        title,
         // Note: We could extend the schema to store additional TMDB data
         // For now, we'll just store the essentials
       },

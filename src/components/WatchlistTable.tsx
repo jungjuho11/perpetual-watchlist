@@ -32,6 +32,8 @@ import {
   Select,
   MenuItem,
   Tooltip,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import {
   Delete,
@@ -60,6 +62,7 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
     pageIndex: 0,
     pageSize: 10,
   });
+  const [activeTab, setActiveTab] = useState(2); // 0: Watched, 1: Not Watched, 2: All
 
   // Fetch watchlist data
   const fetchWatchlist = async () => {
@@ -76,6 +79,7 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
           dateWatched: item.dateWatched ? new Date(item.dateWatched) : null,
         }));
         setData(processedItems);
+        console.log(processedItems);
       }
     } catch (error) {
       console.error('Failed to fetch watchlist:', error);
@@ -87,6 +91,29 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
   useEffect(() => {
     fetchWatchlist();
   }, []);
+
+  // Handle tab change
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setActiveTab(newValue);
+    
+    // Update column filters based on tab selection
+    setColumnFilters(prev => {
+      const filtered = prev.filter(f => f.id !== 'watched');
+      if (newValue === 0) {
+        // Watched
+        return [...filtered, { id: 'watched', value: true }];
+      } else if (newValue === 1) {
+        // Not Watched
+        return [...filtered, { id: 'watched', value: false }];
+      } else {
+        // All - no filter
+        return filtered;
+      }
+    });
+    
+    // Reset pagination when changing tabs
+    setPagination(prev => ({ ...prev, pageIndex: 0 }));
+  };
 
   // Handle delete item
   const handleDelete = useCallback(async (id: number) => {
@@ -112,23 +139,34 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
   // Define columns
   const columns = useMemo(
     () => [
-      columnHelper.accessor('id', {
-        header: 'ID',
+      // dont need these columns. commenting it out for now. May want to implemtn hidden columns feature later.
+      // columnHelper.accessor('id', {
+      //   header: 'ID',
+      //   cell: info => (
+      //     <Typography variant="body2" color="text.secondary">
+      //       {info.getValue()}
+      //     </Typography>
+      //   ),
+      //   size: 60,
+      //   enableHiding: true
+      // }),
+      // columnHelper.accessor('tmdbId', {
+      //   header: 'TMDB ID',
+      //   cell: info => (
+      //     <Typography variant="body2" color="text.secondary">
+      //       {info.getValue()}
+      //     </Typography>
+      //   ),
+      //   size: 80,
+      // }),
+      columnHelper.accessor('title', {
+        header: 'Title',
         cell: info => (
           <Typography variant="body2" color="text.secondary">
             {info.getValue()}
           </Typography>
         ),
-        size: 60,
-      }),
-      columnHelper.accessor('tmdbId', {
-        header: 'TMDB ID',
-        cell: info => (
-          <Typography variant="body2" color="text.secondary">
-            {info.getValue()}
-          </Typography>
-        ),
-        size: 80,
+        size: 200,
       }),
       columnHelper.accessor('mediaType', {
         header: 'Type',
@@ -145,7 +183,7 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
           );
         },
         filterFn: 'equals',
-        size: 120,
+        size: 100,
       }),
       columnHelper.accessor('watched', {
         header: 'Watched',
@@ -168,7 +206,7 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
       //     />
       //   ),
         filterFn: 'equals',
-        size: 80,
+        size: 70,
       }),
       columnHelper.accessor('dateWatched', {
         header: 'Date Watched',
@@ -180,7 +218,7 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
             </Typography>
           );
         },
-        size: 120,
+        size: 110,
       }),
       columnHelper.accessor('dateAdded', {
         header: 'Date Added',
@@ -189,7 +227,7 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
             {info.getValue().toLocaleDateString()}
           </Typography>
         ),
-        size: 120,
+        size: 110,
       }),
       columnHelper.accessor('userRating', {
         header: 'Rating',
@@ -197,7 +235,7 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
           const rating = info.getValue();
           return rating ? rating : '-'
         },
-        size: 150,
+        size: 80,
       }),
       columnHelper.accessor('priority', {
         header: 'Priority',
@@ -209,7 +247,7 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
             </Typography>
           );
         },
-        size: 80,
+        size: 70,
       }),
       columnHelper.accessor('favorite', {
         header: 'Favorite',
@@ -281,6 +319,9 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
     getPaginationRowModel: getPaginationRowModel(),
   });
 
+  // Get filtered data count for display
+  const filteredCount = table.getFilteredRowModel().rows.length;
+
   if (loading) {
     return (
       <Box sx={{ p: 4, textAlign: 'center' }}>
@@ -291,11 +332,8 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
 
   return (
     <Box sx={{ width: '100%' }}>
-      {/* Header and Filters */}
+      {/* Header */}
       <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h5" component="h2">
-          Your Watchlist ({data.length} items)
-        </Typography>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
           <FormControl size="small" sx={{ minWidth: 120 }}>
             <InputLabel>Filter Type</InputLabel>
@@ -316,32 +354,32 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
               <MenuItem value="tv">TV Shows</MenuItem>
             </Select>
           </FormControl>
-          
-          <FormControl size="small" sx={{ minWidth: 120 }}>
-            <InputLabel>Filter Status</InputLabel>
-            <Select
-              value={columnFilters.find(f => f.id === 'watched')?.value ?? ''}
-              label="Filter Status"
-              onChange={(e) => {
-                const value = e.target.value;
-                setColumnFilters(prev => 
-                  value !== '' 
-                    ? [...prev.filter(f => f.id !== 'watched'), { id: 'watched', value: value === 'true' }]
-                    : prev.filter(f => f.id !== 'watched')
-                );
-              }}
-            >
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="false">Not Watched</MenuItem>
-              <MenuItem value="true">Watched</MenuItem>
-            </Select>
-          </FormControl>
         </Box>
       </Box>
 
+      {/* Status Filter Tabs */}
+      <Box sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs 
+          value={activeTab} 
+          onChange={handleTabChange}
+          sx={{ 
+            '& .MuiTab-root': {
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: '1rem',
+              minWidth: 120,
+            }
+          }}
+        >
+          <Tab label="Watched" />
+          <Tab label="Not Watched" />
+          <Tab label="All" />
+        </Tabs>
+      </Box>
+
       {/* Table */}
-      <TableContainer component={Paper} sx={{ mb: 2 }}>
-        <Table size="small" stickyHeader>
+      <TableContainer component={Paper} sx={{ mb: 2, overflow: 'auto' }}>
+        <Table size="small" stickyHeader sx={{ '& .MuiTableCell-root': { px: 1.5, py: 1 } }}>
           <TableHead>
             {table.getHeaderGroups().map(headerGroup => (
               <TableRow key={headerGroup.id}>
@@ -403,7 +441,7 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
       {/* Pagination */}
       <TablePagination
         component="div"
-        count={data.length}
+        count={filteredCount}
         page={pagination.pageIndex}
         onPageChange={(_, newPage) => setPagination(prev => ({ ...prev, pageIndex: newPage }))}
         rowsPerPage={pagination.pageSize}
