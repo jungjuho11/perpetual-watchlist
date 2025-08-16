@@ -45,11 +45,12 @@ import { WatchlistItem } from '../types/watchlist';
 
 interface WatchlistTableProps {
   onRefresh?: () => void;
+  isAdmin?: boolean;
 }
 
 const columnHelper = createColumnHelper<WatchlistItem>();
 
-const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh }) => {
+const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = false }) => {
   const [data, setData] = useState<WatchlistItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -229,31 +230,34 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh }) => {
         ),
         size: 140,
       }),
-      columnHelper.display({
-        id: 'actions',
-        header: 'Actions',
-        cell: info => (
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Tooltip title="Edit">
-              <IconButton size="small" color="primary">
-                <Edit />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Delete">
-              <IconButton
-                size="small"
-                color="error"
-                onClick={() => handleDelete(info.row.original.id)}
-              >
-                <Delete />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        ),
-        size: 100,
-      }),
+      // Only show actions column for admin users
+      ...(isAdmin ? [
+        columnHelper.display({
+          id: 'actions',
+          header: 'Actions',
+          cell: info => (
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Tooltip title="Edit">
+                <IconButton size="small" color="primary">
+                  <Edit />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Delete">
+                <IconButton
+                  size="small"
+                  color="error"
+                  onClick={() => handleDelete(info.row.original.id)}
+                >
+                  <Delete />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          ),
+          size: 100,
+        })
+      ] : []),
     ],
-    [handleDelete]
+    [handleDelete, isAdmin]
   );
 
   const table = useReactTable({

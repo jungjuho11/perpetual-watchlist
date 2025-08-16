@@ -3,12 +3,14 @@
 import { Container, Typography, Box, Alert, Divider } from '@mui/material';
 import SearchBar from '../components/SearchBar';
 import WatchlistTable from '../components/WatchlistTable';
+import AdminButton from '../components/AdminButton';
 import { SearchResultItem } from './api/search/route';
 import { useState } from 'react';
 
 export default function Home() {
   const [notification, setNotification] = useState<string | null>(null);
   const [refreshTable, setRefreshTable] = useState(0);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
 
   const handleAddToWatchlist = async (item: SearchResultItem) => {
     try {
@@ -48,14 +50,25 @@ export default function Home() {
     }
   };
 
+  const handleAuthChange = (isAdmin: boolean) => {
+    setIsAdminLoggedIn(isAdmin);
+  };
+
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Box sx={{ textAlign: 'center', mb: 6 }}>
-        <Typography variant="h2" component="h1" gutterBottom>
-          Perpetual Watchlist
-        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Box /> {/* Spacer */}
+          <Typography variant="h2" component="h1">
+            Perpetual Watchlist
+          </Typography>
+          <AdminButton onAuthChange={handleAuthChange} />
+        </Box>
         <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
-          Track movies and TV shows you want to watch
+          {isAdminLoggedIn 
+            ? 'Admin Dashboard - Manage your watchlist' 
+            : 'Track movies and TV shows you want to watch'
+          }
         </Typography>
         
         {notification && (
@@ -74,11 +87,18 @@ export default function Home() {
       <Divider sx={{ my: 4 }} />
       
       {/* Watchlist Table */}
-      <WatchlistTable key={refreshTable} onRefresh={() => setRefreshTable(prev => prev + 1)} />
+      <WatchlistTable 
+        key={refreshTable} 
+        onRefresh={() => setRefreshTable(prev => prev + 1)}
+        isAdmin={isAdminLoggedIn}
+      />
       
       <Box sx={{ mt: 6, textAlign: 'center' }}>
         <Typography variant="body2" color="text.secondary">
-          Search for movies and TV shows above to add them to your watchlist.
+          {isAdminLoggedIn
+            ? 'You can edit ratings, mark as watched, and delete items.'
+            : 'Search for movies and TV shows above to add them to your watchlist.'
+          }
         </Typography>
       </Box>
     </Container>
