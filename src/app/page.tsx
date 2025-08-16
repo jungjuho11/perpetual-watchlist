@@ -1,14 +1,14 @@
 'use client';
 
-import { Container, Typography, Box, Alert, Divider } from '@mui/material';
+import { Container, Typography, Box, Divider } from '@mui/material';
 import SearchBar from '../components/SearchBar';
 import WatchlistTable from '../components/WatchlistTable';
 import AdminButton from '../components/AdminButton';
 import { SearchResultItem } from './api/search/route';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 export default function Home() {
-  const [notification, setNotification] = useState<string | null>(null);
   const [refreshTable, setRefreshTable] = useState(0);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
 
@@ -33,20 +33,16 @@ export default function Home() {
       const data = await response.json();
 
       if (response.ok) {
-        setNotification(`Added "${item.title}" to your watchlist!`);
+        toast.success(`Added "${item.title}" to your watchlist!`);
         setRefreshTable(prev => prev + 1); // Trigger table refresh
       } else if (response.status === 409) {
-        setNotification(`"${item.title}" is already in your watchlist!`);
+        toast.error(`"${item.title}" is already in your watchlist!`);
       } else {
         throw new Error(data.error || 'Failed to add to watchlist');
       }
-      
-      // Clear notification after 3 seconds
-      setTimeout(() => setNotification(null), 3000);
     } catch (error) {
       console.error('Failed to add to watchlist:', error);
-      setNotification('Failed to add item to watchlist');
-      setTimeout(() => setNotification(null), 3000);
+      toast.error('Failed to add item to watchlist');
     }
   };
 
@@ -71,16 +67,6 @@ export default function Home() {
           }
         </Typography>
         
-        {notification && (
-          <Alert 
-            severity="success" 
-            sx={{ mb: 3, maxWidth: 600, mx: 'auto' }}
-            onClose={() => setNotification(null)}
-          >
-            {notification}
-          </Alert>
-        )}
-        
         <SearchBar onAddToWatchlist={handleAddToWatchlist} />
       </Box>
       
@@ -97,7 +83,7 @@ export default function Home() {
         <Typography variant="body2" color="text.secondary">
           {isAdminLoggedIn
             ? 'You can edit ratings, mark as watched, and delete items.'
-            : 'Search for movies and TV shows above to add them to your watchlist.'
+            : 'Search for movies and TV shows above to add them to Juho\'s watchlist.'
           }
         </Typography>
       </Box>

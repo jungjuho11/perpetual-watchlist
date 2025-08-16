@@ -42,6 +42,7 @@ import {
   StarBorder,
 } from '@mui/icons-material';
 import { WatchlistItem } from '../types/watchlist';
+import toast from 'react-hot-toast';
 
 interface WatchlistTableProps {
   onRefresh?: () => void;
@@ -90,18 +91,23 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
   // Handle delete item
   const handleDelete = useCallback(async (id: number) => {
     try {
+      const itemToDelete = data.find(item => item.id === id);
       const response = await fetch(`/api/watchlist/${id}`, {
         method: 'DELETE',
       });
       
       if (response.ok) {
         setData(prev => prev.filter(item => item.id !== id));
+        toast.success(`Removed "${itemToDelete?.title}" from watchlist`);
         if (onRefresh) onRefresh();
+      } else {
+        toast.error('Failed to delete item from watchlist');
       }
     } catch (error) {
       console.error('Failed to delete item:', error);
+      toast.error('Failed to delete item from watchlist');
     }
-  }, [onRefresh]);
+  }, [data, onRefresh]);
 
   // Define columns
   const columns = useMemo(
@@ -143,14 +149,24 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
       }),
       columnHelper.accessor('watched', {
         header: 'Watched',
-        cell: info => (
-          <Checkbox
+        cell: info => {
+         return (
+            isAdmin ?  <Checkbox
             checked={info.getValue()}
             color="primary"
             size="small"
             readOnly
-          />
-        ),
+          /> : info.getValue() ? 'YES' : 'NO'
+         )
+        },
+      //   cell: info => (
+      //     <Checkbox
+      //       checked={info.getValue()}
+      //       color="primary"
+      //       size="small"
+      //       readOnly
+      //     />
+      //   ),
         filterFn: 'equals',
         size: 80,
       }),
@@ -179,19 +195,7 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
         header: 'Rating',
         cell: info => {
           const rating = info.getValue();
-          return rating ? (
-            <Rating
-              value={rating}
-              readOnly
-              size="small"
-              max={10}
-              precision={0.1}
-            />
-          ) : (
-            <Typography variant="body2" color="text.secondary">
-              -
-            </Typography>
-          );
+          return rating ? rating : '-'
         },
         size: 150,
       }),
