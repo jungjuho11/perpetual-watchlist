@@ -616,9 +616,20 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
             {table.getRowModel().rows.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={columns.length} align="center">
-                  <Typography color="text.secondary" sx={{ py: 4 }}>
-                    No items in your watchlist yet. Add some movies or TV shows above!
-                  </Typography>
+                  <Box sx={{ py: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                    <img 
+                      src="/where-is-it.gif" 
+                      alt="Where is it?" 
+                      style={{ 
+                        maxWidth: '200px', 
+                        maxHeight: '200px', 
+                        borderRadius: '8px' 
+                      }} 
+                    />
+                    <Typography color="text.secondary" variant="body2">
+                      I know what you&apos;re thinking. Where is it? Well, sometimes it takes Supabase to wake up. Thank you for your patience!
+                    </Typography>
+                  </Box>
                 </TableCell>
               </TableRow>
             ) : (
