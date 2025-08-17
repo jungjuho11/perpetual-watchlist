@@ -8,11 +8,24 @@ export const supabase = supabaseUrl && supabaseAnonKey
   ? createClient(supabaseUrl, supabaseAnonKey)
   : createClient('https://dummy.supabase.co', 'dummy-key');
 
-// Helper function to check if current user is admin
+// Helper function to check if current user is admin (server-side check)
 export const isAdmin = async () => {
   const { data: { user } } = await supabase.auth.getUser();
-  const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-  return user?.email === adminEmail;
+  if (!user?.email) return false;
+  
+  // Call server-side API to check admin status
+  try {
+    const response = await fetch('/api/auth/check-admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: user.email })
+    });
+    const { isAdmin } = await response.json();
+    return isAdmin;
+  } catch (error) {
+    console.error('Error checking admin status:', error);
+    return false;
+  }
 };
 
 // Helper to get current user
