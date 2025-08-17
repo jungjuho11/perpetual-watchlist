@@ -205,6 +205,56 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
     }
   }, [data, onRefresh]);
 
+  // Handle toggle favorite status
+  const handleToggleFavorite = useCallback(async (id: number, currentFavorite: boolean) => {
+    try {
+      const newFavoriteStatus = !currentFavorite;
+      
+      // Optimistic update
+      setData(prev => prev.map(item => 
+        item.id === id 
+          ? { ...item, favorite: newFavoriteStatus }
+          : item
+      ));
+
+      const response = await fetch(`/api/watchlist/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          favorite: newFavoriteStatus,
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        // Update with the actual server response
+        setData(prev => prev.map(item => 
+          item.id === id 
+            ? { ...item, favorite: result.item.favorite }
+            : item
+        ));
+        
+        const itemTitle = data.find(item => item.id === id)?.title;
+        toast.success(`${newFavoriteStatus ? 'Added' : 'Removed'} "${itemTitle}" ${newFavoriteStatus ? 'to' : 'from'} favorites`);
+      } else {
+        // Revert optimistic update on error
+        setData(prev => prev.map(item => 
+          item.id === id ? { ...item, favorite: currentFavorite } : item
+        ));
+        toast.error('Failed to update favorite status');
+      }
+    } catch (error) {
+      console.error('Failed to update favorite status:', error);
+      // Revert optimistic update on error
+      setData(prev => prev.map(item => 
+        item.id === id ? { ...item, favorite: currentFavorite } : item
+      ));
+      toast.error('Failed to update favorite status');
+    }
+  }, [data]);
+
   // Define all columns
   const allColumns = useMemo(() => [
       // dont need these columns. commenting it out for now. May want to implemtn hidden columns feature later.
@@ -276,21 +326,29 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
         filterFn: 'equals',
         size: 70,
       }),
-      columnHelper.accessor('favorite', {
-         id: 'favorite',
-         header: 'Favorite',
-         cell: info => (
-           <IconButton size="small" disabled>
-             {info.getValue() ? (
-               <Star color="warning" />
-             ) : (
-               <StarBorder color="disabled" />
-             )}
-           </IconButton>
-         ),
-         filterFn: 'equals',
-         size: 80,
-       }),
+             columnHelper.accessor('favorite', {
+          id: 'favorite',
+          header: 'Favorite',
+          cell: info => (
+            <IconButton 
+              size="small" 
+              disabled={!isAdmin}
+              onClick={isAdmin ? () => handleToggleFavorite(info.row.original.id, info.getValue()) : undefined}
+              sx={{ 
+                cursor: isAdmin ? 'pointer' : 'default',
+                '&:hover': isAdmin ? { backgroundColor: 'action.hover' } : {}
+              }}
+            >
+              {info.getValue() ? (
+                <Star color="warning" />
+              ) : (
+                <StarBorder color={isAdmin ? 'action' : 'disabled'} />
+              )}
+            </IconButton>
+          ),
+          filterFn: 'equals',
+          size: 80,
+        }),
       columnHelper.accessor('dateWatched', {
         id: 'dateWatched',
         header: 'Date Watched',
@@ -373,7 +431,7 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
           size: 100,
         })
       ] : []),
-    ], [handleDelete, handleToggleWatched, isAdmin]);
+    ], [handleDelete, handleToggleWatched, handleToggleFavorite, isAdmin]);
 
   // Filter columns based on active tab
   const columns = useMemo(() => {
