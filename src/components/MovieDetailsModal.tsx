@@ -151,89 +151,98 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
 
         {details && (
           <Box>
-            {/* Backdrop Header */}
+            {/* Header Section */}
             <Box
               sx={{
-                position: 'relative',
-                height: 300,
-                backgroundImage: details.backdropUrl ? `url(${details.backdropUrl})` : 'none',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
                 backgroundColor: 'grey.900',
-                display: 'flex',
-                alignItems: 'flex-end',
+                p: 4,
               }}
             >
-              <Box
-                sx={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: 'linear-gradient(transparent 0%, rgba(0,0,0,0.7) 100%)',
-                }}
-              />
-              
-              <Box sx={{ position: 'relative', p: 3, color: 'white', width: '100%' }}>
-                <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-end' }}>
-                  {details.posterUrl && (
-                    <Card sx={{ flexShrink: 0 }}>
-                      <CardMedia
-                        component="img"
-                        image={details.posterUrl}
-                        alt={details.title}
-                        sx={{ width: 120, height: 180 }}
-                      />
-                    </Card>
-                  )}
+              <Box sx={{ display: 'flex', gap: 4, alignItems: 'flex-start', color: 'white' }}>
+                {details.posterUrl && (
+                  <Card sx={{ flexShrink: 0 }}>
+                    <CardMedia
+                      component="img"
+                      image={details.posterUrl}
+                      alt={details.title}
+                      sx={{ width: 280, height: 420 }}
+                    />
+                  </Card>
+                )}
+                
+                <Box sx={{ flex: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                    <Typography variant="h3" component="h1" fontWeight="bold">
+                      {details.title}
+                    </Typography>
+                    <Chip
+                      icon={details.mediaType === 'movie' ? <Movie /> : <Tv />}
+                      label={details.mediaType === 'movie' ? 'Movie' : 'TV Show'}
+                      size="small"
+                      variant="outlined"
+                      sx={{ color: 'white', borderColor: 'white' }}
+                    />
+                  </Box>
                   
-                  <Box sx={{ flex: 1 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                      <Typography variant="h4" component="h1" fontWeight="bold">
-                        {details.title}
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Star sx={{ color: 'gold', fontSize: 28 }} />
+                      <Typography variant="h5">
+                        {details.rating}/10
                       </Typography>
-                      <Chip
-                        icon={details.mediaType === 'movie' ? <Movie /> : <Tv />}
-                        label={details.mediaType === 'movie' ? 'Movie' : 'TV Show'}
-                        size="small"
-                        variant="outlined"
-                        sx={{ color: 'white', borderColor: 'white' }}
-                      />
+                      <Typography variant="body1" color="grey.300">
+                        ({details.voteCount.toLocaleString()} votes)
+                      </Typography>
                     </Box>
                     
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <Star sx={{ color: 'gold' }} />
-                        <Typography variant="h6">
-                          {details.rating}/10
-                        </Typography>
-                        <Typography variant="body2" color="grey.300">
-                          ({details.voteCount.toLocaleString()} votes)
+                    {details.imdbId && (
+                      <Button
+                        variant="outlined"
+                        size="medium"
+                        href={`https://www.imdb.com/title/${details.imdbId}`}
+                        target="_blank"
+                        sx={{ color: 'white', borderColor: 'white' }}
+                      >
+                        IMDb
+                      </Button>
+                    )}
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
+                    {details.genres.map((genre) => (
+                      <Chip
+                        key={genre}
+                        label={genre}
+                        size="medium"
+                        variant="filled"
+                        sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}
+                      />
+                    ))}
+                  </Box>
+
+                  {/* Quick Details */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <CalendarToday fontSize="small" color="action" />
+                      <Typography variant="body1">
+                        {formatReleaseDate(details.releaseDate)}
+                      </Typography>
+                    </Box>
+                    
+                    {details.runtime && (
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <AccessTime fontSize="small" color="action" />
+                        <Typography variant="body1">
+                          {formatRuntime(details.runtime)}
                         </Typography>
                       </Box>
-                      
-                      {details.imdbId && (
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          href={`https://www.imdb.com/title/${details.imdbId}`}
-                          target="_blank"
-                          sx={{ color: 'white', borderColor: 'white' }}
-                        >
-                          IMDb
-                        </Button>
-                      )}
-                    </Box>
+                    )}
                     
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                      {details.genres.map((genre) => (
-                        <Chip
-                          key={genre}
-                          label={genre}
-                          size="small"
-                          variant="filled"
-                          sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}
-                        />
-                      ))}
-                    </Box>
+                    {details.seasons && (
+                      <Typography variant="body1">
+                        {details.seasons} Seasons • {details.episodes} Episodes
+                      </Typography>
+                    )}
                   </Box>
                 </Box>
               </Box>
@@ -254,56 +263,9 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                   <Divider sx={{ my: 2 }} />
 
                   <Typography variant="h6" gutterBottom>
-                    Details
+                    Additional Details
                   </Typography>
                   <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
-                    <Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                        <CalendarToday fontSize="small" color="action" />
-                        <Typography variant="body2" color="text.secondary">
-                          Release Date
-                        </Typography>
-                      </Box>
-                      <Typography variant="body1">
-                        {formatReleaseDate(details.releaseDate)}
-                      </Typography>
-                    </Box>
-                    
-                    {details.runtime && (
-                      <Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                          <AccessTime fontSize="small" color="action" />
-                          <Typography variant="body2" color="text.secondary">
-                            Runtime
-                          </Typography>
-                        </Box>
-                        <Typography variant="body1">
-                          {formatRuntime(details.runtime)}
-                        </Typography>
-                      </Box>
-                    )}
-                    
-                    {details.seasons && (
-                      <>
-                        <Box>
-                          <Typography variant="body2" color="text.secondary">
-                            Seasons
-                          </Typography>
-                          <Typography variant="body1">
-                            {details.seasons}
-                          </Typography>
-                        </Box>
-                        <Box>
-                          <Typography variant="body2" color="text.secondary">
-                            Episodes
-                          </Typography>
-                          <Typography variant="body1">
-                            {details.episodes}
-                          </Typography>
-                        </Box>
-                      </>
-                    )}
-                    
                     <Box sx={{ gridColumn: { xs: '1', sm: '1 / -1' } }}>
                       <Typography variant="body2" color="text.secondary">
                         {details.mediaType === 'movie' ? 'Director' : 'Creators'}
