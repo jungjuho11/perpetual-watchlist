@@ -64,6 +64,7 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
     pageSize: 10,
   });
   const [activeTab, setActiveTab] = useState(2); // 0: Watched, 1: Not Watched, 2: All
+  const [columnVisibility, setColumnVisibility] = useState({});
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<{
     tmdbId: number;
@@ -94,7 +95,6 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
           dateWatched: item.dateWatched ? new Date(item.dateWatched) : null,
         }));
         setData(processedItems);
-        toast.success('Watchlist loaded successfully!');
         setLoading(false);
       } else if (result.error) {
         throw new Error(result.error);
@@ -138,6 +138,20 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
       } else {
         // All - no filter
         return filtered;
+      }
+    });
+    
+    // Update column visibility based on tab selection
+    setColumnVisibility(() => {
+      if (newValue === 0) {
+        // Tab 0: Watched - hide 'watched' and 'priority' columns
+        return { watched: false, priority: false };
+      } else if (newValue === 1) {
+        // Tab 1: Not Watched - hide 'watched', 'dateWatched', 'priority', and 'favorite' columns
+        return { watched: false, dateWatched: false, priority: false, favorite: false };
+      } else {
+        // Tab 2: All - show all columns
+        return {};
       }
     });
     
@@ -485,25 +499,10 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
       ] : []),
     ], [handleDelete, handleToggleWatched, handleToggleFavorite, handleOpenDetails, isAdmin]);
 
-  // Filter columns based on active tab
+  // Use all columns (visibility is handled by columnVisibility state)
   const columns = useMemo(() => {
-    return allColumns.filter(column => {
-      const columnId = column.id;
-      
-      // Tab 0: Watched - hide 'watched' and 'priority' columns
-      if (activeTab === 0) {
-        return columnId !== 'watched' && columnId !== 'priority';
-      }
-      
-      // Tab 1: Not Watched - hide 'watched', 'dateWatched', and 'priority' columns
-      if (activeTab === 1) {
-        return columnId !== 'watched' && columnId !== 'dateWatched' && columnId !== 'priority' && columnId !== 'favorite';
-      }
-      
-      // Tab 2: All - show all columns
-      return true;
-    });
-  }, [allColumns, activeTab]);
+    return allColumns;
+  }, [allColumns]);
 
   const table = useReactTable({
     data,
@@ -512,10 +511,12 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
       sorting,
       columnFilters,
       pagination,
+      columnVisibility,
     },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onPaginationChange: setPagination,
+    onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
