@@ -14,14 +14,14 @@ export const isAdmin = async () => {
     console.log('isAdmin: Starting admin check...');
     
     // Add timeout to prevent hanging
-    const timeoutPromise = new Promise((_, reject) => 
+    const timeoutPromise = new Promise<never>((_, reject) => 
       setTimeout(() => reject(new Error('Auth getUser timeout')), 5000)
     );
     
     const getUserPromise = supabase.auth.getUser();
     
     console.log('isAdmin: Getting user with timeout...');
-    const { data: { user } } = await Promise.race([getUserPromise, timeoutPromise]) as any;
+    const { data: { user } } = await Promise.race([getUserPromise, timeoutPromise]);
     
     console.log('isAdmin: Got user result:', !!user, user?.email);
     
