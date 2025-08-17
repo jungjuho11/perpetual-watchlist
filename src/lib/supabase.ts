@@ -10,25 +10,37 @@ export const supabase = supabaseUrl && supabaseAnonKey
 
 // Helper function to check if current user is admin (server-side check)
 export const isAdmin = async () => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user?.email) return false;
-  
-  // Call server-side API to check admin status
   try {
+    console.log('isAdmin: Starting admin check...');
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user?.email) {
+      console.log('isAdmin: No user or email found');
+      return false;
+    }
+    
+    console.log('isAdmin: Checking admin status for user:', user.email);
+    
+    // Call server-side API to check admin status
     const response = await fetch('/api/auth/check-admin', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: user.email })
     });
     
+    console.log('isAdmin: API response status:', response.status);
+    
     if (!response.ok) {
+      console.error('isAdmin: API returned non-200 status:', response.status);
       return false;
     }
     
     const data = await response.json();
+    console.log('isAdmin: API response data:', data);
+    
     return data.isAdmin || false;
   } catch (error) {
-    console.error('Error checking admin status:', error);
+    console.error('isAdmin: Error checking admin status:', error);
     return false;
   }
 };

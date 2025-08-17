@@ -94,6 +94,7 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
           dateWatched: item.dateWatched ? new Date(item.dateWatched) : null,
         }));
         setData(processedItems);
+        toast.success('Watchlist loaded successfully!');
         setLoading(false);
       } else if (result.error) {
         throw new Error(result.error);

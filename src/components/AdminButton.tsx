@@ -85,17 +85,27 @@ const AdminButton: React.FC<AdminButtonProps> = ({ onAuthChange }) => {
 
       // If login successful, immediately check admin status
       if (data.user) {
-        console.log('Login successful, checking admin status...');
+        console.log('Login successful, checking admin status for:', data.user.email);
         
         try {
           const adminStatus = await isAdmin();
           console.log('Admin status result:', adminStatus);
           
-          setIsAdminUser(adminStatus);
-          onAuthChange(adminStatus);
-          setShowLogin(false);
-          setEmail('');
-          setPassword('');
+          if (adminStatus) {
+            setIsAdminUser(true);
+            onAuthChange(true);
+            setShowLogin(false);
+            setEmail('');
+            setPassword('');
+            console.log('Admin login completed successfully');
+          } else {
+            console.log('User is not admin');
+            setError('You are not authorized as an admin.');
+            // Still close the modal but don't set admin status
+            setShowLogin(false);
+            setEmail('');
+            setPassword('');
+          }
         } catch (adminError) {
           console.error('Error checking admin status after login:', adminError);
           setError('Login successful but admin check failed. Please try again.');
