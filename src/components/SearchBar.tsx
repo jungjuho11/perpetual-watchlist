@@ -16,6 +16,7 @@ import { Search, Add, Movie, Tv } from '@mui/icons-material';
 import { debounce } from '@mui/material/utils';
 import { SearchResultItem } from '../app/api/search/route';
 import AddToWatchlistForm from './AddToWatchlistForm';
+import ContactGateModal from './ContactGateModal';
 
 interface SearchBarProps {
   isAdmin: boolean;
@@ -28,6 +29,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isAdmin, onWatchlistSuccess }) =>
   const [inputValue, setInputValue] = useState('');
   const [formOpen, setFormOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<SearchResultItem | null>(null);
+  const [contactGateOpen, setContactGateOpen] = useState(false);
 
   const debouncedSearch = useMemo(
     () => debounce(async (query: string) => {
@@ -63,7 +65,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ isAdmin, onWatchlistSuccess }) =>
 
   const handleAddToWatchlist = (item: SearchResultItem) => {
     setSelectedItem(item);
-    setFormOpen(true);
+    
+    // If not admin, show contact gate first
+    if (!isAdmin) {
+      setContactGateOpen(true);
+    } else {
+      setFormOpen(true);
+    }
   };
 
   const handleFormClose = () => {
@@ -73,6 +81,16 @@ const SearchBar: React.FC<SearchBarProps> = ({ isAdmin, onWatchlistSuccess }) =>
 
   const handleFormSuccess = () => {
     onWatchlistSuccess();
+  };
+
+  const handleContactGateClose = () => {
+    setContactGateOpen(false);
+    setSelectedItem(null);
+  };
+
+  const handleContactGateProceed = () => {
+    setContactGateOpen(false);
+    setFormOpen(true);
   };
 
   const formatReleaseYear = (releaseDate: string) => {
@@ -212,6 +230,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ isAdmin, onWatchlistSuccess }) =>
             <Typography sx={{ p: 2 }}>Start typing to search...</Typography>
           )
         }
+      />
+      
+      <ContactGateModal
+        open={contactGateOpen}
+        onClose={handleContactGateClose}
+        onProceed={handleContactGateProceed}
+        movieTitle={selectedItem?.title || ''}
       />
       
       <AddToWatchlistForm
