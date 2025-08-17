@@ -45,6 +45,7 @@ import {
 } from '@mui/icons-material';
 import { WatchlistItem } from '../types/watchlist';
 import toast from 'react-hot-toast';
+import MovieDetailsModal from './MovieDetailsModal';
 
 interface WatchlistTableProps {
   onRefresh?: () => void;
@@ -63,6 +64,12 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
     pageSize: 10,
   });
   const [activeTab, setActiveTab] = useState(2); // 0: Watched, 1: Not Watched, 2: All
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<{
+    tmdbId: number;
+    mediaType: 'movie' | 'tv';
+    title: string;
+  } | null>(null);
 
   // Fetch watchlist data
   const fetchWatchlist = async () => {
@@ -255,6 +262,18 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
     }
   }, [data]);
 
+  // Handle opening movie details modal
+  const handleOpenDetails = useCallback((tmdbId: number, mediaType: 'movie' | 'tv', title: string) => {
+    setSelectedItem({ tmdbId, mediaType, title });
+    setModalOpen(true);
+  }, []);
+
+  // Handle closing movie details modal
+  const handleCloseDetails = useCallback(() => {
+    setModalOpen(false);
+    setSelectedItem(null);
+  }, []);
+
   // Define all columns
   const allColumns = useMemo(() => [
       // dont need these columns. commenting it out for now. May want to implemtn hidden columns feature later.
@@ -281,7 +300,22 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
         id: 'title',
         header: 'Title',
         cell: info => (
-          <Typography variant="body2" color="text.secondary">
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: 'primary.main',
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              '&:hover': {
+                color: 'primary.dark',
+              }
+            }}
+            onClick={() => handleOpenDetails(
+              info.row.original.tmdbId, 
+              info.row.original.mediaType, 
+              info.getValue() || ''
+            )}
+          >
             {info.getValue()}
           </Typography>
         ),
@@ -412,11 +446,6 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
           header: 'Actions',
           cell: info => (
             <Box sx={{ display: 'flex', gap: 1 }}>
-              <Tooltip title="Edit">
-                <IconButton size="small" color="primary">
-                  <Edit />
-                </IconButton>
-              </Tooltip>
               <Tooltip title="Delete">
                 <IconButton
                   size="small"
@@ -431,7 +460,7 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
           size: 100,
         })
       ] : []),
-    ], [handleDelete, handleToggleWatched, handleToggleFavorite, isAdmin]);
+    ], [handleDelete, handleToggleWatched, handleToggleFavorite, handleOpenDetails, isAdmin]);
 
   // Filter columns based on active tab
   const columns = useMemo(() => {
@@ -598,6 +627,14 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
         rowsPerPage={pagination.pageSize}
         onRowsPerPageChange={(e) => setPagination(prev => ({ ...prev, pageSize: parseInt(e.target.value, 10), pageIndex: 0 }))}
         rowsPerPageOptions={[5, 10, 25, 50]}
+      />
+      
+      <MovieDetailsModal
+        open={modalOpen}
+        onClose={handleCloseDetails}
+        tmdbId={selectedItem?.tmdbId || null}
+        mediaType={selectedItem?.mediaType || null}
+        title={selectedItem?.title || ''}
       />
     </Box>
   );
