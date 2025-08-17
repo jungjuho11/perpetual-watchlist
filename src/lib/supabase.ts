@@ -12,7 +12,18 @@ export const supabase = supabaseUrl && supabaseAnonKey
 export const isAdmin = async () => {
   try {
     console.log('isAdmin: Starting admin check...');
-    const { data: { user } } = await supabase.auth.getUser();
+    
+    // Add timeout to prevent hanging
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Auth getUser timeout')), 5000)
+    );
+    
+    const getUserPromise = supabase.auth.getUser();
+    
+    console.log('isAdmin: Getting user with timeout...');
+    const { data: { user } } = await Promise.race([getUserPromise, timeoutPromise]) as any;
+    
+    console.log('isAdmin: Got user result:', !!user, user?.email);
     
     if (!user?.email) {
       console.log('isAdmin: No user or email found');
