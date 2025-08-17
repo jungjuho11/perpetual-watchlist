@@ -51,7 +51,7 @@ import toast from 'react-hot-toast';
 import MovieDetailsModal from './MovieDetailsModal';
 import { createFilterHandlers, getFilterValues, shouldShowFavoriteFilter } from '../lib/watchlistFilters';
 import { useFetchWatchlist, ProcessedWatchlistItem } from '../lib/watchlistApi';
-import { createWatchlistActionHandlers } from '../lib/watchlistActions';
+import { useWatchlistActions } from '../lib/watchlistActions';
 
 interface WatchlistTableProps {
    onRefresh?: () => void;
@@ -97,8 +97,8 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
 
    const { handleSearchChange, handleTabChange, handleMediaTypeChange, handleFavoriteChange } = filterHandlers;
 
-   // Create action handlers using the helper
-   const { handleDelete, handleToggleWatched, handleToggleFavorite, handleOpenDetails } = createWatchlistActionHandlers(
+   // Create action handlers using the custom hook
+   const { handleDelete, handleToggleWatched, handleToggleFavorite, handleOpenDetails } = useWatchlistActions(
       data,
       setData,
       setSelectedItem,

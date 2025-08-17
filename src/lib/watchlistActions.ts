@@ -9,7 +9,7 @@ export interface WatchlistActionHandlers {
   handleOpenDetails: (tmdbId: number, mediaType: 'movie' | 'tv', title: string) => void;
 }
 
-export const createWatchlistActionHandlers = (
+export const useWatchlistActions = (
   data: ProcessedWatchlistItem[],
   setData: React.Dispatch<React.SetStateAction<ProcessedWatchlistItem[]>>,
   setSelectedItem: React.Dispatch<React.SetStateAction<{
@@ -55,7 +55,12 @@ export const createWatchlistActionHandlers = (
     ));
 
     try {
-      const updateData: any = { watched: newWatchedStatus };
+      const updateData: {
+        watched: boolean;
+        dateWatched?: null;
+        userRating?: null;
+        favorite?: boolean;
+      } = { watched: newWatchedStatus };
       
       // If marking as unwatched, clear related fields
       if (!newWatchedStatus) {
