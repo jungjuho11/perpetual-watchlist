@@ -120,13 +120,30 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
       fullWidth
       PaperProps={{
         sx: { 
-          borderRadius: 2,
+          borderRadius: 4,
           maxHeight: '90vh',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255,255,255,0.1)'
         }
       }}
     >
-      <DialogActions sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}>
-        <IconButton onClick={handleClose} sx={{ bgcolor: 'rgba(0,0,0,0.5)', color: 'white' }}>
+      <DialogActions sx={{ position: 'absolute', top: 16, right: 16, zIndex: 1 }}>
+        <IconButton 
+          onClick={handleClose} 
+          sx={{ 
+            bgcolor: 'rgba(255,255,255,0.1)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255,255,255,0.2)',
+            color: 'white',
+            '&:hover': { 
+              bgcolor: 'rgba(255,255,255,0.2)',
+              transform: 'scale(1.1)'
+            },
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+          }}
+        >
           <Close />
         </IconButton>
       </DialogActions>
@@ -154,13 +171,21 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
             {/* Header Section */}
             <Box
               sx={{
-                backgroundColor: 'grey.900',
+                background: 'linear-gradient(135deg, rgba(25, 118, 210, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255,255,255,0.1)',
                 p: 4,
               }}
             >
               <Box sx={{ display: 'flex', gap: 4, alignItems: 'flex-start', color: 'white' }}>
                 {details.posterUrl && (
-                  <Card sx={{ flexShrink: 0 }}>
+                  <Card sx={{ 
+                    flexShrink: 0,
+                    borderRadius: 3,
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    overflow: 'hidden'
+                  }}>
                     <CardMedia
                       component="img"
                       image={details.posterUrl}
@@ -171,16 +196,33 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                 )}
                 
                 <Box sx={{ flex: 1 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                    <Typography variant="h3" component="h1" fontWeight="bold">
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                    <Typography 
+                      variant="h3" 
+                      component="h1" 
+                      sx={{
+                        fontWeight: 700,
+                        background: 'linear-gradient(135deg, #fff 0%, #e3f2fd 100%)',
+                        backgroundClip: 'text',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                      }}
+                    >
                       {details.title}
                     </Typography>
                     <Chip
                       icon={details.mediaType === 'movie' ? <Movie /> : <Tv />}
                       label={details.mediaType === 'movie' ? 'Movie' : 'TV Show'}
-                      size="small"
-                      variant="outlined"
-                      sx={{ color: 'white', borderColor: 'white' }}
+                      size="medium"
+                      sx={{
+                        background: details.mediaType === 'movie' 
+                          ? 'linear-gradient(135deg, #1976d2 0%, #9333ea 100%)'
+                          : 'linear-gradient(135deg, #9c27b0 0%, #e91e63 100%)',
+                        color: 'white',
+                        fontWeight: 600,
+                        border: 'none',
+                        '& .MuiChip-icon': { color: 'white' }
+                      }}
                     />
                   </Box>
                   
@@ -201,21 +243,42 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                         size="medium"
                         href={`https://www.imdb.com/title/${details.imdbId}`}
                         target="_blank"
-                        sx={{ color: 'white', borderColor: 'white' }}
+                        sx={{ 
+                          borderRadius: 3,
+                          px: 3,
+                          py: 1,
+                          borderColor: 'rgba(255,255,255,0.5)',
+                          color: 'white',
+                          background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+                          backdropFilter: 'blur(5px)',
+                          fontWeight: 600,
+                          '&:hover': {
+                            borderColor: '#f5c518',
+                            background: 'linear-gradient(135deg, rgba(245, 197, 24, 0.2) 0%, rgba(245, 197, 24, 0.1) 100%)',
+                            transform: 'translateY(-2px)',
+                            boxShadow: '0 4px 14px 0 rgba(245, 197, 24, 0.3)'
+                          },
+                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                        }}
                       >
                         IMDb
                       </Button>
                     )}
                   </Box>
                   
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mb: 3 }}>
                     {details.genres.map((genre) => (
                       <Chip
                         key={genre}
                         label={genre}
                         size="medium"
-                        variant="filled"
-                        sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}
+                        sx={{ 
+                          background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%)',
+                          color: 'white',
+                          border: '1px solid rgba(255,255,255,0.3)',
+                          fontWeight: 500,
+                          backdropFilter: 'blur(5px)'
+                        }}
                       />
                     ))}
                   </Box>
@@ -249,51 +312,111 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
             </Box>
 
             {/* Content Section */}
-            <Box sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', md: 'row' } }}>
+            <Box sx={{ p: 4 }}>
+              <Box sx={{ display: 'flex', gap: 4, flexDirection: { xs: 'column', md: 'row' } }}>
                 {/* Left Column - Overview and Details */}
-                <Box sx={{ flex: 2 }}>
-                  <Typography variant="h6" gutterBottom>
-                    Overview
+                <Box sx={{ 
+                  flex: 2,
+                  p: 3,
+                  borderRadius: 3,
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  backdropFilter: 'blur(5px)'
+                }}>
+                  <Typography variant="h5" sx={{ 
+                    mb: 2,
+                    fontWeight: 600,
+                    background: 'linear-gradient(135deg, #1976d2 0%, #9333ea 100%)',
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}>
+                    📖 Overview
                   </Typography>
-                  <Typography variant="body1" paragraph>
+                  <Typography variant="body1" paragraph sx={{ lineHeight: 1.7, mb: 3 }}>
                     {details.overview || 'No overview available.'}
                   </Typography>
 
-                  <Divider sx={{ my: 2 }} />
+                  <Divider sx={{ my: 3, opacity: 0.6 }} />
 
-                  <Typography variant="h6" gutterBottom>
-                    Additional Details
+                  <Typography variant="h6" sx={{ 
+                    mb: 2,
+                    fontWeight: 600,
+                    background: 'linear-gradient(135deg, #1976d2 0%, #9333ea 100%)',
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}>
+                    🎬 Additional Details
                   </Typography>
-                  <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
-                    <Box sx={{ gridColumn: { xs: '1', sm: '1 / -1' } }}>
-                      <Typography variant="body2" color="text.secondary">
-                        {details.mediaType === 'movie' ? 'Director' : 'Creators'}
-                      </Typography>
-                      <Typography variant="body1">
-                        {details.director || details.creators?.join(', ') || 'Unknown'}
-                      </Typography>
-                    </Box>
+                  <Box sx={{ 
+                    p: 2,
+                    borderRadius: 2,
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%)',
+                    border: '1px solid rgba(255,255,255,0.1)'
+                  }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                      {details.mediaType === 'movie' ? 'Director' : 'Creators'}
+                    </Typography>
+                    <Typography variant="body1" fontWeight="500">
+                      {details.director || details.creators?.join(', ') || 'Unknown'}
+                    </Typography>
                   </Box>
                 </Box>
 
                 {/* Right Column - Cast */}
-                <Box sx={{ flex: 1, minWidth: { md: 300 } }}>
-                  <Typography variant="h6" gutterBottom>
-                    Main Cast
+                <Box sx={{ 
+                  flex: 1, 
+                  minWidth: { md: 300 },
+                  p: 3,
+                  borderRadius: 3,
+                  background: 'linear-gradient(135deg, rgba(147, 51, 234, 0.05) 0%, rgba(236, 72, 153, 0.05) 100%)',
+                  border: '1px solid rgba(147, 51, 234, 0.1)',
+                  backdropFilter: 'blur(5px)'
+                }}>
+                  <Typography variant="h5" sx={{ 
+                    mb: 3,
+                    fontWeight: 600,
+                    background: 'linear-gradient(135deg, #9333ea 0%, #ec4899 100%)',
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}>
+                    🎭 Main Cast
                   </Typography>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     {details.cast.map((actor, index) => (
-                      <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Box 
+                        key={index} 
+                        sx={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: 2,
+                          p: 2,
+                          borderRadius: 2,
+                          background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%)',
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                          '&:hover': {
+                            transform: 'translateY(-2px)',
+                            boxShadow: '0 4px 14px 0 rgba(147, 51, 234, 0.2)',
+                            background: 'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 100%)'
+                          }
+                        }}
+                      >
                         <Avatar
                           src={actor.profileUrl || undefined}
                           alt={actor.name}
-                          sx={{ width: 50, height: 50 }}
+                          sx={{ 
+                            width: 50, 
+                            height: 50,
+                            border: '2px solid rgba(147, 51, 234, 0.3)'
+                          }}
                         >
                           {actor.name.charAt(0)}
                         </Avatar>
                         <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Typography variant="body2" fontWeight="medium" noWrap>
+                          <Typography variant="body2" fontWeight="600" noWrap>
                             {actor.name}
                           </Typography>
                           <Typography variant="caption" color="text.secondary" noWrap>

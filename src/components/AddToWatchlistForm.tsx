@@ -130,24 +130,58 @@ const AddToWatchlistForm: React.FC<AddToWatchlistFormProps> = ({
   if (!item) return null;
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
-      maxWidth="sm" 
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
       fullWidth
       PaperProps={{
-        sx: { borderRadius: 2 }
+        sx: {
+          borderRadius: 4,
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255,255,255,0.1)'
+        }
       }}
     >
-      <DialogTitle>
-        <Typography variant="h6" component="div">
-          Add to Watchlist
-        </Typography>
+      <DialogTitle sx={{ pb: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{
+            p: 1.5,
+            borderRadius: 3,
+            background: 'linear-gradient(135deg, rgba(25, 118, 210, 0.1) 0%, rgba(25, 118, 210, 0.05) 100%)',
+            border: '1px solid rgba(25, 118, 210, 0.2)'
+          }}>
+            {item?.mediaType === 'movie' ? (
+              <Movie color="primary" sx={{ fontSize: 28 }} />
+            ) : (
+              <Tv color="primary" sx={{ fontSize: 28 }} />
+            )}
+          </Box>
+          <Box>
+            <Typography variant="h5" fontWeight="600" sx={{ mb: 0.5 }}>
+              Add to Watchlist
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {isAdmin ? 'Configure your watchlist entry' : 'Recommend this to Juho'}
+            </Typography>
+          </Box>
+        </Box>
       </DialogTitle>
-      
+
       <DialogContent dividers>
         {/* Item Preview */}
-        <Box sx={{ display: 'flex', gap: 2, mb: 3, p: 2, bgcolor: 'action.hover', borderRadius: 1 }}>
+        <Box sx={{
+          display: 'flex',
+          gap: 2,
+          mb: 4,
+          p: 3,
+          borderRadius: 3,
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          backdropFilter: 'blur(5px)'
+        }}>
           <Avatar
             src={item.posterUrl || undefined}
             alt={item.title}
@@ -156,27 +190,33 @@ const AddToWatchlistForm: React.FC<AddToWatchlistFormProps> = ({
           >
             {item.mediaType === 'movie' ? <Movie /> : <Tv />}
           </Avatar>
-          
+
           <Box sx={{ flex: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-              <Typography variant="subtitle1" fontWeight="bold">
+              <Typography variant="subtitle1" fontWeight="600">
                 {item.title}
               </Typography>
               <Chip
                 label={item.mediaType === 'movie' ? 'Movie' : 'TV Show'}
                 size="small"
-                color={item.mediaType === 'movie' ? 'primary' : 'secondary'}
-                variant="outlined"
+                sx={{
+                  background: item.mediaType === 'movie'
+                    ? 'linear-gradient(135deg, #1976d2 0%, #9333ea 100%)'
+                    : 'linear-gradient(135deg, #9c27b0 0%, #e91e63 100%)',
+                  color: 'white',
+                  fontWeight: 600,
+                  border: 'none'
+                }}
               />
             </Box>
-            
+
             {formatReleaseYear(item.releaseDate) && (
               <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                 {formatReleaseYear(item.releaseDate)} {item.rating > 0 && `• ⭐ ${item.rating}`}
               </Typography>
             )}
-            
-            <Typography variant="body2" color="text.secondary" sx={{ 
+
+            <Typography variant="body2" color="text.secondary" sx={{
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               display: '-webkit-box',
@@ -191,11 +231,24 @@ const AddToWatchlistForm: React.FC<AddToWatchlistFormProps> = ({
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* Admin Fields */}
           {isAdmin && (
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 'bold' }}>
-                Admin Options
+            <Box sx={{
+              mb: 4,
+              p: 3,
+              borderRadius: 3,
+              background: 'linear-gradient(135deg, rgba(25, 118, 210, 0.05) 0%, rgba(147, 51, 234, 0.05) 100%)',
+              border: '1px solid rgba(25, 118, 210, 0.1)'
+            }}>
+              <Typography variant="h6" sx={{
+                mb: 3,
+                fontWeight: 600,
+                background: 'linear-gradient(135deg, #1976d2 0%, #9333ea 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}>
+                🎬 Admin Options
               </Typography>
-              
+
               <Controller
                 name="watched"
                 control={control}
@@ -225,7 +278,14 @@ const AddToWatchlistForm: React.FC<AddToWatchlistFormProps> = ({
 
               {/* Watched-specific fields */}
               {watchedValue && (
-                <Box sx={{ ml: 2, p: 2, bgcolor: 'action.hover', borderRadius: 1 }}>
+                <Box sx={{
+                  ml: 2,
+                  p: 3,
+                  borderRadius: 3,
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  backdropFilter: 'blur(5px)'
+                }}>
                   <Controller
                     name="dateWatched"
                     control={control}
@@ -283,11 +343,24 @@ const AddToWatchlistForm: React.FC<AddToWatchlistFormProps> = ({
 
           {/* Regular User Fields */}
           {!isAdmin && (
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 'bold' }}>
-                Recommendation Details
+            <Box sx={{
+              mb: 4,
+              p: 3,
+              borderRadius: 3,
+              background: 'linear-gradient(135deg, rgba(147, 51, 234, 0.05) 0%, rgba(236, 72, 153, 0.05) 100%)',
+              border: '1px solid rgba(147, 51, 234, 0.1)'
+            }}>
+              <Typography variant="h6" sx={{
+                mb: 3,
+                fontWeight: 600,
+                background: 'linear-gradient(135deg, #9333ea 0%, #ec4899 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}>
+                💡 Recommendation Details
               </Typography>
-              
+
               <Controller
                 name="recommendedBy"
                 control={control}
@@ -323,13 +396,45 @@ const AddToWatchlistForm: React.FC<AddToWatchlistFormProps> = ({
           )}
         </form>
       </DialogContent>
-      
-      <DialogActions sx={{ p: 2 }}>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button 
-          onClick={handleSubmit(onSubmit)} 
-          variant="contained" 
-          color="primary"
+
+      <DialogActions sx={{ p: 3, gap: 2 }}>
+        <Button
+          onClick={onClose}
+          variant="outlined"
+          size="medium"
+          sx={{
+            borderRadius: 3,
+            px: 3,
+            py: 1,
+            borderColor: 'rgba(255,255,255,0.3)',
+            color: 'text.secondary',
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
+            '&:hover': {
+              borderColor: 'rgba(255,255,255,0.5)',
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)'
+            }
+          }}
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={handleSubmit(onSubmit)}
+          variant="contained"
+          size="medium"
+          sx={{
+            borderRadius: 3,
+            px: 4,
+            py: 1,
+            background: 'linear-gradient(135deg, #1976d2 0%, #9333ea 100%)',
+            boxShadow: '0 4px 14px 0 rgba(25, 118, 210, 0.3)',
+            '&:hover': {
+              background: 'linear-gradient(135deg, #1565c0 0%, #7c3aed 100%)',
+              boxShadow: '0 8px 20px 0 rgba(25, 118, 210, 0.4)',
+              transform: 'translateY(-2px)'
+            },
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            fontWeight: 600
+          }}
         >
           Add to Watchlist
         </Button>

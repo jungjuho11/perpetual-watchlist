@@ -52,7 +52,7 @@ const ContactGateModal: React.FC<ContactGateModalProps> = ({
       id: 'linkedin',
       icon: <LinkedIn />,
       title: 'Connect on LinkedIn',
-      description: 'Best for professional opportunities',
+      description: 'Best for professional opportunities!',
       action: () => window.open('https://www.linkedin.com/in/juho-jung-a58442152/', '_blank'),
       color: '#0077B5',
       recommended: true,
@@ -95,7 +95,8 @@ const ContactGateModal: React.FC<ContactGateModalProps> = ({
         sx: {
           borderRadius: 4,
           boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+          // background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+          background: 'linear-gradient(135deg, rgba(0,0,0,0.1) 0%, rgba(255,255,255,0.05) 100%)',
           backdropFilter: 'blur(10px)',
           border: '1px solid rgba(255,255,255,0.1)'
         }
