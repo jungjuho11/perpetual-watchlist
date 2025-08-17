@@ -113,11 +113,11 @@ const ContactGateModal: React.FC<ContactGateModalProps> = ({
         <Card sx={{ mb: 3, bgcolor: 'primary.main', color: 'white' }}>
           <CardContent sx={{ textAlign: 'center', py: 2 }}>
             <Typography variant="h6" gutterBottom>
-              🎬 Let's Connect First!
+              🎬 Let&apos;s Connect First!
             </Typography>
             <Typography variant="body2">
-              I love recommendations, but I'd love to connect with you even more! 
-              Choose how you'd like to reach out:
+              I love recommendations, but I&apos;d love to connect with you even more! 
+              Choose how you&apos;d like to reach out:
             </Typography>
           </CardContent>
         </Card>
@@ -185,12 +185,7 @@ const ContactGateModal: React.FC<ContactGateModalProps> = ({
 
         <Divider sx={{ my: 3 }} />
 
-        <Box sx={{ textAlign: 'center' }}>
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            <Work sx={{ fontSize: 16, mr: 0.5 }} />
-            Are you a recruiter? I'm always open to new opportunities!
-          </Typography>
-          
+        <Box sx={{ textAlign: 'center' }}>         
           <Button
             variant="outlined"
             size="small"
