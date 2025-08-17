@@ -14,11 +14,11 @@ import {
   Card,
   CardContent,
 } from '@mui/material';
-import { 
-  Close, 
-  LinkedIn, 
-  Email, 
-  GitHub, 
+import {
+  Close,
+  LinkedIn,
+  Email,
+  GitHub,
   Coffee,
   Work,
   Movie,
@@ -78,7 +78,7 @@ const ContactGateModal: React.FC<ContactGateModalProps> = ({
   const handleContactSelect = (option: typeof contactOptions[0]) => {
     setSelectedContact(option.id);
     option.action();
-    
+
     // Small delay to show selection, then allow proceeding
     setTimeout(() => {
       onProceed();
@@ -86,10 +86,10 @@ const ContactGateModal: React.FC<ContactGateModalProps> = ({
   };
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
-      maxWidth="sm" 
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
       fullWidth
       PaperProps={{
         sx: { borderRadius: 3 }
@@ -110,13 +110,13 @@ const ContactGateModal: React.FC<ContactGateModalProps> = ({
       </DialogTitle>
 
       <DialogContent>
-        <Card sx={{ mb: 3, bgcolor: 'primary.main', color: 'white' }}>
+        <Card sx={{ mb: 3, bgcolor: 'primary.secondary', color: 'white' }}>
           <CardContent sx={{ textAlign: 'center', py: 2 }}>
             <Typography variant="h6" gutterBottom>
               🎬 Let&apos;s Connect First!
             </Typography>
             <Typography variant="body2">
-              I love recommendations, but I&apos;d love to connect with you even more! 
+              I love recommendations, but I&apos;d love to connect with you even more!
               Choose how you&apos;d like to reach out:
             </Typography>
           </CardContent>
@@ -142,8 +142,8 @@ const ContactGateModal: React.FC<ContactGateModalProps> = ({
             >
               <CardContent sx={{ py: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Box 
-                    sx={{ 
+                  <Box
+                    sx={{
                       color: option.color,
                       display: 'flex',
                       alignItems: 'center',
@@ -152,18 +152,18 @@ const ContactGateModal: React.FC<ContactGateModalProps> = ({
                   >
                     {option.icon}
                   </Box>
-                  
+
                   <Box sx={{ flex: 1 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
                       <Typography variant="subtitle1" fontWeight="bold">
                         {option.title}
                       </Typography>
                       {option.recommended && (
-                        <Chip 
-                          label="Recommended" 
-                          size="small" 
-                          color="primary" 
-                          icon={<Star />} 
+                        <Chip
+                          label="Recommended"
+                          size="small"
+                          color="primary"
+                          icon={<Star />}
                         />
                       )}
                     </Box>
@@ -185,7 +185,7 @@ const ContactGateModal: React.FC<ContactGateModalProps> = ({
 
         <Divider sx={{ my: 3 }} />
 
-        <Box sx={{ textAlign: 'center' }}>         
+        <Box sx={{ textAlign: 'center' }}>
           <Button
             variant="outlined"
             size="small"
