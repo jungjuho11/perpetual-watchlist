@@ -27,9 +27,17 @@ const AdminButton: React.FC<AdminButtonProps> = ({ onAuthChange }) => {
   const [error, setError] = useState<string | null>(null);
 
   const checkAuthStatus = useCallback(async () => {
-    const adminStatus = await isAdmin();
-    setIsAdminUser(adminStatus);
-    onAuthChange(adminStatus);
+    try {
+      console.log('AdminButton: Checking auth status...');
+      const adminStatus = await isAdmin();
+      console.log('AdminButton: Admin status result:', adminStatus);
+      setIsAdminUser(adminStatus);
+      onAuthChange(adminStatus);
+    } catch (error) {
+      console.error('AdminButton: Error checking auth status:', error);
+      setIsAdminUser(false);
+      onAuthChange(false);
+    }
   }, [onAuthChange]);
 
   useEffect(() => {
@@ -37,10 +45,18 @@ const AdminButton: React.FC<AdminButtonProps> = ({ onAuthChange }) => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('AdminButton: Auth state changed:', event, !!session?.user);
         if (session?.user) {
-          const adminStatus = await isAdmin();
-          setIsAdminUser(adminStatus);
-          onAuthChange(adminStatus);
+          try {
+            const adminStatus = await isAdmin();
+            console.log('AdminButton: Post-auth admin status:', adminStatus);
+            setIsAdminUser(adminStatus);
+            onAuthChange(adminStatus);
+          } catch (error) {
+            console.error('AdminButton: Error checking admin status after auth change:', error);
+            setIsAdminUser(false);
+            onAuthChange(false);
+          }
         } else {
           setIsAdminUser(false);
           onAuthChange(false);

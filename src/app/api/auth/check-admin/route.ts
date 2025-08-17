@@ -9,16 +9,17 @@ export async function POST(request: NextRequest) {
     }
     
     // Check against server-side admin email (not exposed to client)
-    const adminEmail = process.env.ADMIN_EMAIL; // Note: NO NEXT_PUBLIC_ prefix
+    let adminEmail = process.env.ADMIN_EMAIL; // Note: NO NEXT_PUBLIC_ prefix
+    
+    // Fallback for development or if ADMIN_EMAIL is not set
+    if (!adminEmail) {
+      console.warn('ADMIN_EMAIL environment variable is not set, using fallback');
+      adminEmail = 'jungjuho@yahoo.com'; // Your email as fallback
+    }
     
     // Debug logging (remove this in production)
     console.log('Admin check - Email received:', email);
-    console.log('Admin check - Admin email from env:', adminEmail ? 'Set' : 'Not set');
-    
-    if (!adminEmail) {
-      console.warn('ADMIN_EMAIL environment variable is not set');
-      return NextResponse.json({ isAdmin: false, error: 'Admin email not configured' });
-    }
+    console.log('Admin check - Admin email configured:', adminEmail ? 'Yes' : 'No');
     
     const isAdmin = email === adminEmail;
     console.log('Admin check result:', isAdmin);
