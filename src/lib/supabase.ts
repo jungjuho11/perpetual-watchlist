@@ -15,31 +15,17 @@ export const isAdmin = async () => {
   
   // Call server-side API to check admin status
   try {
-    console.log('Checking admin status for:', user.email);
-    
-    // Add timeout to prevent hanging
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Admin check timeout')), 10000)
-    );
-    
-    const fetchPromise = fetch('/api/auth/check-admin', {
+    const response = await fetch('/api/auth/check-admin', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: user.email })
     });
     
-    const response = await Promise.race([fetchPromise, timeoutPromise]) as Response;
-    
-    console.log('Admin check response status:', response.status);
-    
     if (!response.ok) {
-      console.error('Admin check API returned non-200 status:', response.status);
       return false;
     }
     
     const data = await response.json();
-    console.log('Admin check response data:', data);
-    
     return data.isAdmin || false;
   } catch (error) {
     console.error('Error checking admin status:', error);
