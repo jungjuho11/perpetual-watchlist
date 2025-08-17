@@ -31,7 +31,7 @@ export default function Home() {
         <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
           {isAdminLoggedIn 
             ? 'Admin Dashboard - Manage your watchlist' 
-            : 'Track movies and TV shows you want to watch'
+            : 'Search for movies and TV shows add them to Juho\'s watchlist.'
           }
         </Typography>
         
@@ -49,15 +49,6 @@ export default function Home() {
         onRefresh={() => setRefreshTable(prev => prev + 1)}
         isAdmin={isAdminLoggedIn}
       />
-      
-      <Box sx={{ mt: 6, textAlign: 'center' }}>
-        <Typography variant="body2" color="text.secondary">
-          {isAdminLoggedIn
-            ? 'You can edit ratings, mark as watched, and delete items.'
-            : 'Search for movies and TV shows above to add them to Juho\'s watchlist.'
-          }
-        </Typography>
-      </Box>
     </Container>
   );
 }

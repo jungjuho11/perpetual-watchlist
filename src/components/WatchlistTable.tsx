@@ -136,6 +136,75 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
     }
   }, [data, onRefresh]);
 
+  // Handle toggle watched status
+  const handleToggleWatched = useCallback(async (id: number, currentWatched: boolean) => {
+    try {
+      const newWatchedStatus = !currentWatched;
+      
+      // Optimistic update
+      setData(prev => prev.map(item => 
+        item.id === id 
+          ? { 
+              ...item, 
+              watched: newWatchedStatus,
+              // Clear watch-related fields if marking as unwatched
+              dateWatched: newWatchedStatus ? item.dateWatched : null,
+              userRating: newWatchedStatus ? item.userRating : null,
+              favorite: newWatchedStatus ? item.favorite : false
+            }
+          : item
+      ));
+
+      const response = await fetch(`/api/watchlist/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          watched: newWatchedStatus,
+          // Clear related fields when marking as unwatched
+          ...(!newWatchedStatus && {
+            dateWatched: null,
+            userRating: null,
+            favorite: false
+          })
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        // Update with the actual server response
+        setData(prev => prev.map(item => 
+          item.id === id 
+            ? { 
+                ...item, 
+                watched: result.item.watched,
+                dateWatched: result.item.dateWatched ? new Date(result.item.dateWatched) : null,
+                userRating: result.item.userRating,
+                favorite: result.item.favorite
+              }
+            : item
+        ));
+        
+        const itemTitle = data.find(item => item.id === id)?.title;
+        toast.success(`Marked "${itemTitle}" as ${newWatchedStatus ? 'watched' : 'not watched'}`);
+      } else {
+        // Revert optimistic update on error
+        setData(prev => prev.map(item => 
+          item.id === id ? { ...item, watched: currentWatched } : item
+        ));
+        toast.error('Failed to update watched status');
+      }
+    } catch (error) {
+      console.error('Failed to update watched status:', error);
+      // Revert optimistic update on error
+      setData(prev => prev.map(item => 
+        item.id === id ? { ...item, watched: currentWatched } : item
+      ));
+      toast.error('Failed to update watched status');
+    }
+  }, [data, onRefresh]);
+
   // Define all columns
   const allColumns = useMemo(() => [
       // dont need these columns. commenting it out for now. May want to implemtn hidden columns feature later.
@@ -191,12 +260,17 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
         header: 'Watched',
         cell: info => {
          return (
-            isAdmin ?  <Checkbox
-            checked={info.getValue()}
-            color="primary"
-            size="small"
-            readOnly
-          /> : info.getValue() ? 'YES' : 'NO'
+            isAdmin ? (
+              <Checkbox
+                checked={info.getValue()}
+                color="primary"
+                size="small"
+                onChange={() => handleToggleWatched(info.row.original.id, info.getValue())}
+                sx={{ cursor: 'pointer' }}
+              />
+            ) : (
+              info.getValue() ? 'YES' : 'NO'
+            )
          )
         },
         filterFn: 'equals',
@@ -299,7 +373,7 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
           size: 100,
         })
       ] : []),
-    ], [handleDelete, isAdmin]);
+    ], [handleDelete, handleToggleWatched, isAdmin]);
 
   // Filter columns based on active tab
   const columns = useMemo(() => {
