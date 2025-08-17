@@ -71,11 +71,19 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
     title: string;
   } | null>(null);
 
-  // Fetch watchlist data
-  const fetchWatchlist = async () => {
+  // Fetch watchlist data with retry logic
+  const fetchWatchlist = async (retryCount = 0) => {
     try {
-      setLoading(true);
+      if (retryCount === 0) {
+        setLoading(true);
+      }
+      
       const response = await fetch('/api/watchlist');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
       const result = await response.json();
       
       if (result.items) {
@@ -86,12 +94,26 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
           dateWatched: item.dateWatched ? new Date(item.dateWatched) : null,
         }));
         setData(processedItems);
-        console.log(processedItems);
+        setLoading(false);
+      } else if (result.error) {
+        throw new Error(result.error);
       }
     } catch (error) {
-      console.error('Failed to fetch watchlist:', error);
-    } finally {
-      setLoading(false);
+      console.error(`Failed to fetch watchlist (attempt ${retryCount + 1}):`, error);
+      
+      // Retry up to 3 times with exponential backoff
+      if (retryCount < 2) {
+        const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s
+        toast.error(`Loading failed, retrying in ${delay / 1000}s...`);
+        setTimeout(() => {
+          fetchWatchlist(retryCount + 1);
+        }, delay);
+      } else {
+        // After 3 failed attempts, show error
+        toast.error('Failed to load watchlist. Please refresh the page.');
+        setData([]);
+        setLoading(false);
+      }
     }
   };
 

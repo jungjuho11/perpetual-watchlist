@@ -6,7 +6,9 @@ declare global {
   var prisma: PrismaClient | undefined;
 }
 
-const prisma = globalThis.prisma || new PrismaClient();
+const prisma = globalThis.prisma || new PrismaClient({
+  log: ['warn', 'error'],
+});
 
 if (process.env.NODE_ENV !== 'production') {
   globalThis.prisma = prisma;
@@ -83,6 +85,9 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
+    // Ensure Prisma connection is healthy
+    await prisma.$connect();
+    
     const watchlistItems = await prisma.watchlistItem.findMany({
       orderBy: {
         dateAdded: 'desc',
@@ -92,8 +97,17 @@ export async function GET() {
     return NextResponse.json({ items: watchlistItems });
   } catch (error) {
     console.error('Error fetching watchlist:', error);
+    
+    // Try to disconnect and reconnect if there's a connection issue
+    try {
+      await prisma.$disconnect();
+      await prisma.$connect();
+    } catch (connectionError) {
+      console.error('Prisma connection error:', connectionError);
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to fetch watchlist' },
+      { error: 'Failed to fetch watchlist', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
