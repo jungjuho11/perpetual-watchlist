@@ -136,9 +136,8 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
     }
   }, [data, onRefresh]);
 
-  // Define columns
-  const columns = useMemo(
-    () => [
+  // Define all columns
+  const allColumns = useMemo(() => [
       // dont need these columns. commenting it out for now. May want to implemtn hidden columns feature later.
       // columnHelper.accessor('id', {
       //   header: 'ID',
@@ -160,6 +159,7 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
       //   size: 80,
       // }),
       columnHelper.accessor('title', {
+        id: 'title',
         header: 'Title',
         cell: info => (
           <Typography variant="body2" color="text.secondary">
@@ -169,6 +169,7 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
         size: 200,
       }),
       columnHelper.accessor('mediaType', {
+        id: 'mediaType',
         header: 'Type',
         cell: info => {
           const type = info.getValue();
@@ -186,6 +187,7 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
         size: 100,
       }),
       columnHelper.accessor('watched', {
+        id: 'watched',
         header: 'Watched',
         cell: info => {
          return (
@@ -197,18 +199,26 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
           /> : info.getValue() ? 'YES' : 'NO'
          )
         },
-      //   cell: info => (
-      //     <Checkbox
-      //       checked={info.getValue()}
-      //       color="primary"
-      //       size="small"
-      //       readOnly
-      //     />
-      //   ),
         filterFn: 'equals',
         size: 70,
       }),
+      columnHelper.accessor('favorite', {
+         id: 'favorite',
+         header: 'Favorite',
+         cell: info => (
+           <IconButton size="small" disabled>
+             {info.getValue() ? (
+               <Star color="warning" />
+             ) : (
+               <StarBorder color="disabled" />
+             )}
+           </IconButton>
+         ),
+         filterFn: 'equals',
+         size: 80,
+       }),
       columnHelper.accessor('dateWatched', {
+        id: 'dateWatched',
         header: 'Date Watched',
         cell: info => {
           const date = info.getValue();
@@ -221,6 +231,7 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
         size: 110,
       }),
       columnHelper.accessor('dateAdded', {
+        id: 'dateAdded',
         header: 'Date Added',
         cell: info => (
           <Typography variant="body2">
@@ -230,6 +241,7 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
         size: 110,
       }),
       columnHelper.accessor('userRating', {
+        id: 'userRating',
         header: 'Rating',
         cell: info => {
           const rating = info.getValue();
@@ -238,6 +250,7 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
         size: 80,
       }),
       columnHelper.accessor('priority', {
+        id: 'priority',
         header: 'Priority',
         cell: info => {
           const priority = info.getValue();
@@ -249,21 +262,9 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
         },
         size: 70,
       }),
-      columnHelper.accessor('favorite', {
-        header: 'Favorite',
-        cell: info => (
-          <IconButton size="small" disabled>
-            {info.getValue() ? (
-              <Star color="warning" />
-            ) : (
-              <StarBorder color="disabled" />
-            )}
-          </IconButton>
-        ),
-        filterFn: 'equals',
-        size: 80,
-      }),
+
       columnHelper.accessor('recommendedBy', {
+        id: 'recommendedBy',
         header: 'Recommended By',
         cell: info => (
           <Typography variant="body2">
@@ -298,9 +299,27 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
           size: 100,
         })
       ] : []),
-    ],
-    [handleDelete, isAdmin]
-  );
+    ], [handleDelete, isAdmin]);
+
+  // Filter columns based on active tab
+  const columns = useMemo(() => {
+    return allColumns.filter(column => {
+      const columnId = column.id;
+      
+      // Tab 0: Watched - hide 'watched' and 'priority' columns
+      if (activeTab === 0) {
+        return columnId !== 'watched' && columnId !== 'priority';
+      }
+      
+      // Tab 1: Not Watched - hide 'watched', 'dateWatched', and 'priority' columns
+      if (activeTab === 1) {
+        return columnId !== 'watched' && columnId !== 'dateWatched' && columnId !== 'priority' && columnId !== 'favorite';
+      }
+      
+      // Tab 2: All - show all columns
+      return true;
+    });
+  }, [allColumns, activeTab]);
 
   const table = useReactTable({
     data,
