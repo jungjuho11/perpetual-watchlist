@@ -17,13 +17,8 @@ export const isAdmin = async () => {
   try {
     const response = await fetch('/api/auth/check-admin', {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache'
-      },
-      body: JSON.stringify({ email: user.email }),
-      cache: 'no-store'
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: user.email })
     });
     
     if (!response.ok) {

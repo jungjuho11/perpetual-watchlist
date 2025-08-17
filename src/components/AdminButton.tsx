@@ -43,12 +43,8 @@ const AdminButton: React.FC<AdminButtonProps> = ({ onAuthChange }) => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state changed:', event, !!session?.user);
-        
         if (session?.user) {
           try {
-            // Add small delay to ensure session is fully established
-            await new Promise(resolve => setTimeout(resolve, 100));
             const adminStatus = await isAdmin();
             setIsAdminUser(adminStatus);
             onAuthChange(adminStatus);
@@ -58,7 +54,6 @@ const AdminButton: React.FC<AdminButtonProps> = ({ onAuthChange }) => {
             onAuthChange(false);
           }
         } else {
-          // Immediately clear admin status on sign out
           setIsAdminUser(false);
           onAuthChange(false);
         }
@@ -93,28 +88,7 @@ const AdminButton: React.FC<AdminButtonProps> = ({ onAuthChange }) => {
   };
 
   const handleLogout = async () => {
-    try {
-      setLoading(true);
-      
-      // Clear local state immediately for better UX
-      setIsAdminUser(false);
-      onAuthChange(false);
-      
-      // Sign out from Supabase
-      const { error } = await supabase.auth.signOut();
-      
-      if (error) {
-        console.error('Logout error:', error);
-        // If logout fails, recheck auth status
-        checkAuthStatus();
-      }
-    } catch (error) {
-      console.error('Logout failed:', error);
-      // If logout fails, recheck auth status
-      checkAuthStatus();
-    } finally {
-      setLoading(false);
-    }
+    await supabase.auth.signOut();
   };
 
   if (isAdminUser) {

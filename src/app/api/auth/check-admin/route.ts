@@ -18,23 +18,9 @@ export async function POST(request: NextRequest) {
     
     const isAdmin = email === adminEmail;
     
-    const response = NextResponse.json({ isAdmin });
-    
-    // Prevent caching of admin status
-    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-    response.headers.set('Pragma', 'no-cache');
-    response.headers.set('Expires', '0');
-    
-    return response;
+    return NextResponse.json({ isAdmin });
   } catch (error) {
     console.error('Error checking admin status:', error);
-    const errorResponse = NextResponse.json({ isAdmin: false }, { status: 500 });
-    
-    // Prevent caching of error responses too
-    errorResponse.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-    errorResponse.headers.set('Pragma', 'no-cache');
-    errorResponse.headers.set('Expires', '0');
-    
-    return errorResponse;
+    return NextResponse.json({ isAdmin: false }, { status: 500 });
   }
 }
