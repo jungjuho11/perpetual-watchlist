@@ -10,7 +10,6 @@ import {
   Box,
   Avatar,
   Chip,
-  Grid,
   Card,
   CardMedia,
   CircularProgress,
@@ -145,7 +144,7 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
               {error}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Unable to load details for "{title}"
+              Unable to load details for &quot;{title}&quot;
             </Typography>
           </Box>
         )}
@@ -242,9 +241,9 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
 
             {/* Content Section */}
             <Box sx={{ p: 3 }}>
-              <Grid container spacing={3}>
+              <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', md: 'row' } }}>
                 {/* Left Column - Overview and Details */}
-                <Grid item xs={12} md={8}>
+                <Box sx={{ flex: 2 }}>
                   <Typography variant="h6" gutterBottom>
                     Overview
                   </Typography>
@@ -257,8 +256,8 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                   <Typography variant="h6" gutterBottom>
                     Details
                   </Typography>
-                  <Grid container spacing={2}>
-                    <Grid item xs={6}>
+                  <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+                    <Box>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                         <CalendarToday fontSize="small" color="action" />
                         <Typography variant="body2" color="text.secondary">
@@ -268,10 +267,10 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                       <Typography variant="body1">
                         {formatReleaseDate(details.releaseDate)}
                       </Typography>
-                    </Grid>
+                    </Box>
                     
                     {details.runtime && (
-                      <Grid item xs={6}>
+                      <Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                           <AccessTime fontSize="small" color="action" />
                           <Typography variant="body2" color="text.secondary">
@@ -281,43 +280,43 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                         <Typography variant="body1">
                           {formatRuntime(details.runtime)}
                         </Typography>
-                      </Grid>
+                      </Box>
                     )}
                     
                     {details.seasons && (
                       <>
-                        <Grid item xs={6}>
+                        <Box>
                           <Typography variant="body2" color="text.secondary">
                             Seasons
                           </Typography>
                           <Typography variant="body1">
                             {details.seasons}
                           </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
+                        </Box>
+                        <Box>
                           <Typography variant="body2" color="text.secondary">
                             Episodes
                           </Typography>
                           <Typography variant="body1">
                             {details.episodes}
                           </Typography>
-                        </Grid>
+                        </Box>
                       </>
                     )}
                     
-                    <Grid item xs={12}>
+                    <Box sx={{ gridColumn: { xs: '1', sm: '1 / -1' } }}>
                       <Typography variant="body2" color="text.secondary">
                         {details.mediaType === 'movie' ? 'Director' : 'Creators'}
                       </Typography>
                       <Typography variant="body1">
                         {details.director || details.creators?.join(', ') || 'Unknown'}
                       </Typography>
-                    </Grid>
-                  </Grid>
-                </Grid>
+                    </Box>
+                  </Box>
+                </Box>
 
                 {/* Right Column - Cast */}
-                <Grid item xs={12} md={4}>
+                <Box sx={{ flex: 1, minWidth: { md: 300 } }}>
                   <Typography variant="h6" gutterBottom>
                     Main Cast
                   </Typography>
@@ -342,8 +341,8 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                       </Box>
                     ))}
                   </Box>
-                </Grid>
-              </Grid>
+                </Box>
+              </Box>
             </Box>
           </Box>
         )}
