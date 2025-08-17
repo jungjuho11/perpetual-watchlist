@@ -627,7 +627,7 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
                       }} 
                     />
                     <Typography color="text.secondary" variant="body2">
-                      I know what you&apos;re thinking. Where is it? Well, sometimes it takes Supabase to wake up. Thank you for your patience!
+                      I know what you&apos;re thinking. Where is it? Well, sometimes it takes some time for Supabase to wake up. Thank you for your patience!
                     </Typography>
                   </Box>
                 </TableCell>
