@@ -16,7 +16,21 @@ if (process.env.NODE_ENV !== 'production') {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { tmdbId, mediaType, title } = body;
+    const { 
+      tmdbId, 
+      mediaType, 
+      title, 
+      overview, 
+      posterUrl, 
+      releaseDate, 
+      rating,
+      watched = false,
+      favorite = false,
+      dateWatched,
+      userRating,
+      priority,
+      recommendedBy
+    } = body;
 
     // Validate required fields
     if (!tmdbId || !mediaType || !title) {
@@ -46,11 +60,14 @@ export async function POST(request: NextRequest) {
       data: {
         tmdbId,
         mediaType,
-        watched: false,
-        favorite: false,
         title,
-        // Note: We could extend the schema to store additional TMDB data
-        // For now, we'll just store the essentials
+        posterImage: posterUrl,
+        watched,
+        favorite,
+        dateWatched: dateWatched ? new Date(dateWatched) : null,
+        userRating,
+        priority,
+        recommendedBy,
       },
     });
 

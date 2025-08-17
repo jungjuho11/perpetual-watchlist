@@ -15,15 +15,19 @@ import {
 import { Search, Add, Movie, Tv } from '@mui/icons-material';
 import { debounce } from '@mui/material/utils';
 import { SearchResultItem } from '../app/api/search/route';
+import AddToWatchlistForm from './AddToWatchlistForm';
 
 interface SearchBarProps {
-  onAddToWatchlist?: (item: SearchResultItem) => void;
+  isAdmin: boolean;
+  onWatchlistSuccess: () => void;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ onAddToWatchlist }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ isAdmin, onWatchlistSuccess }) => {
   const [searchResults, setSearchResults] = useState<SearchResultItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const [formOpen, setFormOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<SearchResultItem | null>(null);
 
   const debouncedSearch = useMemo(
     () => debounce(async (query: string) => {
@@ -58,9 +62,17 @@ const SearchBar: React.FC<SearchBarProps> = ({ onAddToWatchlist }) => {
   };
 
   const handleAddToWatchlist = (item: SearchResultItem) => {
-    if (onAddToWatchlist) {
-      onAddToWatchlist(item);
-    }
+    setSelectedItem(item);
+    setFormOpen(true);
+  };
+
+  const handleFormClose = () => {
+    setFormOpen(false);
+    setSelectedItem(null);
+  };
+
+  const handleFormSuccess = () => {
+    onWatchlistSuccess();
   };
 
   const formatReleaseYear = (releaseDate: string) => {
@@ -200,6 +212,14 @@ const SearchBar: React.FC<SearchBarProps> = ({ onAddToWatchlist }) => {
             <Typography sx={{ p: 2 }}>Start typing to search...</Typography>
           )
         }
+      />
+      
+      <AddToWatchlistForm
+        open={formOpen}
+        onClose={handleFormClose}
+        item={selectedItem}
+        isAdmin={isAdmin}
+        onSuccess={handleFormSuccess}
       />
     </Box>
   );
