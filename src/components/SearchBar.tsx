@@ -42,7 +42,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isAdmin, onWatchlistSuccess }) =>
       try {
         const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
         const data = await response.json();
-        
+
         if (data.results) {
           setSearchResults(data.results);
         } else {
@@ -65,7 +65,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isAdmin, onWatchlistSuccess }) =>
 
   const handleAddToWatchlist = (item: SearchResultItem) => {
     setSelectedItem(item);
-    
+
     // If not admin, show contact gate first
     if (!isAdmin) {
       setContactGateOpen(true);
@@ -115,18 +115,35 @@ const SearchBar: React.FC<SearchBarProps> = ({ isAdmin, onWatchlistSuccess }) =>
             fullWidth
             InputProps={{
               ...params.InputProps,
-              startAdornment: <Search sx={{ color: 'text.secondary', mr: 1 }} />,
+              startAdornment: <Search sx={{ color: 'primary.main', mr: 1, fontSize: 24 }} />,
               endAdornment: (
                 <>
-                  {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                  {loading ? <CircularProgress color="primary" size={20} /> : null}
                   {params.InputProps.endAdornment}
                 </>
               ),
             }}
             sx={{
               '& .MuiOutlinedInput-root': {
-                borderRadius: 2,
+                borderRadius: 4,
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                fontSize: '1.1rem',
+                '&:hover': {
+                  border: '1px solid rgba(25, 118, 210, 0.5)',
+                  boxShadow: '0 8px 16px -4px rgba(25, 118, 210, 0.2)'
+                },
+                '&.Mui-focused': {
+                  border: '2px solid rgba(25, 118, 210, 0.8)',
+                  boxShadow: '0 0 0 4px rgba(25, 118, 210, 0.1), 0 8px 16px -4px rgba(25, 118, 210, 0.3)',
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.08) 100%)'
+                }
               },
+              '& .MuiOutlinedInput-notchedOutline': {
+                border: 'none'
+              }
             }}
           />
         )}
@@ -155,7 +172,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isAdmin, onWatchlistSuccess }) =>
               >
                 {option.mediaType === 'movie' ? <Movie /> : <Tv />}
               </Avatar>
-              
+
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
                   <Typography variant="subtitle1" noWrap>
@@ -168,7 +185,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isAdmin, onWatchlistSuccess }) =>
                     variant="outlined"
                   />
                 </Box>
-                
+
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                   {formatReleaseYear(option.releaseDate) && (
                     <Typography variant="body2" color="text.secondary">
@@ -181,7 +198,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isAdmin, onWatchlistSuccess }) =>
                     </Typography>
                   )}
                 </Box>
-                
+
                 <Typography
                   variant="body2"
                   color="text.secondary"
@@ -196,7 +213,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isAdmin, onWatchlistSuccess }) =>
                   {option.overview || 'No description available.'}
                 </Typography>
               </Box>
-              
+
               <IconButton
                 color="primary"
                 onClick={(e) => {
@@ -211,7 +228,17 @@ const SearchBar: React.FC<SearchBarProps> = ({ isAdmin, onWatchlistSuccess }) =>
           </Paper>
         )}
         PaperComponent={({ children }) => (
-          <Paper elevation={8} sx={{ mt: 1, borderRadius: 2 }}>
+          <Paper
+            elevation={0}
+            sx={{
+              mt: 1,
+              borderRadius: 4,
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+            }}
+          >
             {children}
           </Paper>
         )}
@@ -231,14 +258,14 @@ const SearchBar: React.FC<SearchBarProps> = ({ isAdmin, onWatchlistSuccess }) =>
           )
         }
       />
-      
+
       <ContactGateModal
         open={contactGateOpen}
         onClose={handleContactGateClose}
         onProceed={handleContactGateProceed}
         movieTitle={selectedItem?.title || ''}
       />
-      
+
       <AddToWatchlistForm
         open={formOpen}
         onClose={handleFormClose}

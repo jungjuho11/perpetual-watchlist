@@ -44,7 +44,7 @@ const AdminButton: React.FC<AdminButtonProps> = ({ onAuthChange }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth event:', event, 'Has session:', !!session?.user);
-        
+
         if (session?.user) {
           try {
             const adminStatus = await isAdmin();
@@ -86,7 +86,7 @@ const AdminButton: React.FC<AdminButtonProps> = ({ onAuthChange }) => {
       // If login successful, immediately check admin status
       if (data.user) {
         console.log('Login successful, checking admin status for:', data.user.email);
-        
+
         try {
           // Try direct admin check with user email from login data
           const response = await fetch('/api/auth/check-admin', {
@@ -94,13 +94,13 @@ const AdminButton: React.FC<AdminButtonProps> = ({ onAuthChange }) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: data.user.email })
           });
-          
+
           console.log('Direct admin check response status:', response.status);
-          
+
           if (response.ok) {
             const result = await response.json();
             console.log('Direct admin check result:', result);
-            
+
             if (result.isAdmin) {
               setIsAdminUser(true);
               onAuthChange(true);
@@ -134,11 +134,11 @@ const AdminButton: React.FC<AdminButtonProps> = ({ onAuthChange }) => {
 
   const handleLogout = async () => {
     console.log('Logout initiated...');
-    
+
     // Immediately update UI state
     setIsAdminUser(false);
     onAuthChange(false);
-    
+
     // Then handle the actual logout
     try {
       const { error } = await supabase.auth.signOut();
@@ -156,10 +156,23 @@ const AdminButton: React.FC<AdminButtonProps> = ({ onAuthChange }) => {
     return (
       <Button
         variant="contained"
-        color="primary"
         startIcon={<AdminPanelSettings />}
         onClick={handleLogout}
-        size="small"
+        size="medium"
+        sx={{
+          borderRadius: 3,
+          px: 3,
+          py: 1,
+          background: 'linear-gradient(135deg, #1976d2 0%, #9333ea 100%)',
+          boxShadow: '0 4px 14px 0 rgba(25, 118, 210, 0.3)',
+          '&:hover': {
+            background: 'linear-gradient(135deg, #1565c0 0%, #7c3aed 100%)',
+            boxShadow: '0 8px 20px 0 rgba(25, 118, 210, 0.4)',
+            transform: 'translateY(-2px)'
+          },
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          fontWeight: 600
+        }}
       >
         Admin • Logout
       </Button>
@@ -172,17 +185,56 @@ const AdminButton: React.FC<AdminButtonProps> = ({ onAuthChange }) => {
         variant="outlined"
         startIcon={<Login />}
         onClick={() => setShowLogin(true)}
-        size="small"
-        sx={{ borderColor: 'text.secondary', color: 'text.secondary' }}
+        size="medium"
+        sx={{
+          borderRadius: 3,
+          px: 3,
+          py: 1,
+          borderColor: 'rgba(255,255,255,0.3)',
+          color: 'text.secondary',
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
+          backdropFilter: 'blur(5px)',
+          '&:hover': {
+            borderColor: 'rgba(25, 118, 210, 0.5)',
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+            transform: 'translateY(-2px)',
+            boxShadow: '0 4px 14px 0 rgba(25, 118, 210, 0.2)'
+          },
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          fontWeight: 600
+        }}
       >
         Admin?
       </Button>
 
-      <Dialog open={showLogin} onClose={() => setShowLogin(false)} maxWidth="xs" fullWidth>
+      <Dialog
+        open={showLogin}
+        onClose={() => setShowLogin(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 4,
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+          }
+        }}
+      >
         <DialogTitle>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <AdminPanelSettings />
-            Admin Login
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{
+              p: 1.5,
+              borderRadius: 3,
+              background: 'linear-gradient(135deg, rgba(25, 118, 210, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%)',
+              border: '1px solid rgba(25, 118, 210, 0.2)'
+            }}>
+              <AdminPanelSettings color="primary" sx={{ fontSize: 28 }} />
+            </Box>
+            <Typography variant="h5" fontWeight="600">
+              Admin Login
+            </Typography>
           </Box>
         </DialogTitle>
         <DialogContent>
