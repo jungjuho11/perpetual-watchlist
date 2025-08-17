@@ -43,9 +43,12 @@ const AdminButton: React.FC<AdminButtonProps> = ({ onAuthChange }) => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth event:', event, 'Has session:', !!session?.user);
+        
         if (session?.user) {
           try {
             const adminStatus = await isAdmin();
+            console.log('Admin status after auth change:', adminStatus);
             setIsAdminUser(adminStatus);
             onAuthChange(adminStatus);
           } catch (error) {
@@ -54,6 +57,7 @@ const AdminButton: React.FC<AdminButtonProps> = ({ onAuthChange }) => {
             onAuthChange(false);
           }
         } else {
+          console.log('No session, clearing admin status');
           setIsAdminUser(false);
           onAuthChange(false);
         }
@@ -68,19 +72,37 @@ const AdminButton: React.FC<AdminButtonProps> = ({ onAuthChange }) => {
     setError(null);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
         setError(error.message);
-      } else {
-        setShowLogin(false);
-        setEmail('');
-        setPassword('');
+        setLoading(false);
+        return;
       }
-    } catch {
+
+      // If login successful, immediately check admin status
+      if (data.user) {
+        console.log('Login successful, checking admin status...');
+        
+        try {
+          const adminStatus = await isAdmin();
+          console.log('Admin status result:', adminStatus);
+          
+          setIsAdminUser(adminStatus);
+          onAuthChange(adminStatus);
+          setShowLogin(false);
+          setEmail('');
+          setPassword('');
+        } catch (adminError) {
+          console.error('Error checking admin status after login:', adminError);
+          setError('Login successful but admin check failed. Please try again.');
+        }
+      }
+    } catch (loginError) {
+      console.error('Login error:', loginError);
       setError('Login failed. Please try again.');
     } finally {
       setLoading(false);
@@ -88,7 +110,23 @@ const AdminButton: React.FC<AdminButtonProps> = ({ onAuthChange }) => {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    console.log('Logout initiated...');
+    
+    // Immediately update UI state
+    setIsAdminUser(false);
+    onAuthChange(false);
+    
+    // Then handle the actual logout
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Logout error:', error);
+      } else {
+        console.log('Logout successful');
+      }
+    } catch (error) {
+      console.error('Logout exception:', error);
+    }
   };
 
   if (isAdminUser) {
