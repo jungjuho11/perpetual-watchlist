@@ -72,14 +72,14 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
 
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await fetch(`/api/details?tmdbId=${tmdbId}&mediaType=${mediaType}`);
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch details');
       }
-      
+
       const data: DetailedInfo = await response.json();
       setDetails(data);
     } catch (err) {
@@ -105,21 +105,21 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
   const formatReleaseDate = (dateString: string) => {
     if (!dateString) return 'Unknown';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
   };
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={handleClose} 
-      maxWidth="lg" 
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="lg"
       fullWidth
       PaperProps={{
-        sx: { 
+        sx: {
           borderRadius: 4,
           maxHeight: '90vh',
           boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
@@ -130,14 +130,14 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
       }}
     >
       <DialogActions sx={{ position: 'absolute', top: 16, right: 16, zIndex: 1 }}>
-        <IconButton 
-          onClick={handleClose} 
-          sx={{ 
+        <IconButton
+          onClick={handleClose}
+          sx={{
             bgcolor: 'rgba(255,255,255,0.1)',
             backdropFilter: 'blur(10px)',
             border: '1px solid rgba(255,255,255,0.2)',
             color: 'white',
-            '&:hover': { 
+            '&:hover': {
               bgcolor: 'rgba(255,255,255,0.2)',
               transform: 'scale(1.1)'
             },
@@ -179,7 +179,7 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
             >
               <Box sx={{ display: 'flex', gap: 4, alignItems: 'flex-start', color: 'white' }}>
                 {details.posterUrl && (
-                  <Card sx={{ 
+                  <Card sx={{
                     flexShrink: 0,
                     borderRadius: 3,
                     background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
@@ -194,12 +194,12 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                     />
                   </Card>
                 )}
-                
+
                 <Box sx={{ flex: 1 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                    <Typography 
-                      variant="h3" 
-                      component="h1" 
+                    <Typography
+                      variant="h3"
+                      component="h1"
                       sx={{
                         fontWeight: 700,
                         background: 'linear-gradient(135deg, #fff 0%, #e3f2fd 100%)',
@@ -215,7 +215,7 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                       label={details.mediaType === 'movie' ? 'Movie' : 'TV Show'}
                       size="medium"
                       sx={{
-                        background: details.mediaType === 'movie' 
+                        background: details.mediaType === 'movie'
                           ? 'linear-gradient(135deg, #1976d2 0%, #9333ea 100%)'
                           : 'linear-gradient(135deg, #9c27b0 0%, #e91e63 100%)',
                         color: 'white',
@@ -225,7 +225,7 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                       }}
                     />
                   </Box>
-                  
+
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <Star sx={{ color: 'gold', fontSize: 28 }} />
@@ -236,14 +236,14 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                         ({details.voteCount.toLocaleString()} votes)
                       </Typography>
                     </Box>
-                    
+
                     {details.imdbId && (
                       <Button
                         variant="outlined"
                         size="medium"
                         href={`https://www.imdb.com/title/${details.imdbId}`}
                         target="_blank"
-                        sx={{ 
+                        sx={{
                           borderRadius: 3,
                           px: 3,
                           py: 1,
@@ -265,14 +265,14 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                       </Button>
                     )}
                   </Box>
-                  
+
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mb: 3 }}>
                     {details.genres.map((genre) => (
                       <Chip
                         key={genre}
                         label={genre}
                         size="medium"
-                        sx={{ 
+                        sx={{
                           background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%)',
                           color: 'white',
                           border: '1px solid rgba(255,255,255,0.3)',
@@ -291,7 +291,7 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                         {formatReleaseDate(details.releaseDate)}
                       </Typography>
                     </Box>
-                    
+
                     {details.runtime && (
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <AccessTime fontSize="small" color="action" />
@@ -300,7 +300,7 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                         </Typography>
                       </Box>
                     )}
-                    
+
                     {details.seasons && (
                       <Typography variant="body1">
                         {details.seasons} Seasons • {details.episodes} Episodes
@@ -315,7 +315,7 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
             <Box sx={{ p: 4 }}>
               <Box sx={{ display: 'flex', gap: 4, flexDirection: { xs: 'column', md: 'row' } }}>
                 {/* Left Column - Overview and Details */}
-                <Box sx={{ 
+                <Box sx={{
                   flex: 2,
                   p: 3,
                   borderRadius: 3,
@@ -323,7 +323,7 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                   border: '1px solid rgba(255,255,255,0.1)',
                   backdropFilter: 'blur(5px)'
                 }}>
-                  <Typography variant="h5" sx={{ 
+                  <Typography variant="h5" sx={{
                     mb: 2,
                     fontWeight: 600,
                     background: 'linear-gradient(135deg, #1976d2 0%, #9333ea 100%)',
@@ -339,7 +339,7 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
 
                   <Divider sx={{ my: 3, opacity: 0.6 }} />
 
-                  <Typography variant="h6" sx={{ 
+                  <Typography variant="h6" sx={{
                     mb: 2,
                     fontWeight: 600,
                     background: 'linear-gradient(135deg, #1976d2 0%, #9333ea 100%)',
@@ -349,7 +349,7 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                   }}>
                     🎬 Additional Details
                   </Typography>
-                  <Box sx={{ 
+                  <Box sx={{
                     p: 2,
                     borderRadius: 2,
                     background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%)',
@@ -365,8 +365,8 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                 </Box>
 
                 {/* Right Column - Cast */}
-                <Box sx={{ 
-                  flex: 1, 
+                <Box sx={{
+                  flex: 1,
                   minWidth: { md: 300 },
                   p: 3,
                   borderRadius: 3,
@@ -374,7 +374,7 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                   border: '1px solid rgba(147, 51, 234, 0.1)',
                   backdropFilter: 'blur(5px)'
                 }}>
-                  <Typography variant="h5" sx={{ 
+                  <Typography variant="h5" sx={{
                     mb: 3,
                     fontWeight: 600,
                     background: 'linear-gradient(135deg, #9333ea 0%, #ec4899 100%)',
@@ -386,11 +386,11 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                   </Typography>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     {details.cast.map((actor, index) => (
-                      <Box 
-                        key={index} 
-                        sx={{ 
-                          display: 'flex', 
-                          alignItems: 'center', 
+                      <Box
+                        key={index}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
                           gap: 2,
                           p: 2,
                           borderRadius: 2,
@@ -407,8 +407,8 @@ const MovieDetailsModal: React.FC<MovieDetailsModalProps> = ({
                         <Avatar
                           src={actor.profileUrl || undefined}
                           alt={actor.name}
-                          sx={{ 
-                            width: 50, 
+                          sx={{
+                            width: 50,
                             height: 50,
                             border: '2px solid rgba(147, 51, 234, 0.3)'
                           }}

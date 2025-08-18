@@ -28,7 +28,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { watched, favorite, dateWatched, userRating } = body;
+    const { watched, favorite, dateWatched, dateAdded, userRating, priority, recommendedBy } = body;
 
     // Check if item exists
     const existingItem = await prisma.watchlistItem.findUnique({
@@ -49,7 +49,10 @@ export async function PUT(
         watched: watched !== undefined ? watched : existingItem.watched,
         favorite: favorite !== undefined ? favorite : existingItem.favorite,
         dateWatched: dateWatched !== undefined ? (dateWatched ? new Date(dateWatched) : null) : existingItem.dateWatched,
+        dateAdded: dateAdded !== undefined ? (dateAdded ? new Date(dateAdded) : existingItem.dateAdded) : existingItem.dateAdded,
         userRating: userRating !== undefined ? userRating : existingItem.userRating,
+        priority: priority !== undefined ? priority : existingItem.priority,
+        recommendedBy: recommendedBy !== undefined ? recommendedBy : existingItem.recommendedBy,
       },
     });
 

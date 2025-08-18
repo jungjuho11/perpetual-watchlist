@@ -52,6 +52,7 @@ import MovieDetailsModal from './MovieDetailsModal';
 import { createFilterHandlers, getFilterValues, shouldShowFavoriteFilter } from '../lib/watchlistFilters';
 import { useFetchWatchlist, ProcessedWatchlistItem } from '../lib/watchlistApi';
 import { useWatchlistActions } from '../lib/watchlistActions';
+import EditWatchlistItemModal from './EditWatchlistItemModal';
 
 interface WatchlistTableProps {
    onRefresh?: () => void;
@@ -78,6 +79,8 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
       mediaType: 'movie' | 'tv';
       title: string;
    } | null>(null);
+   const [editModalOpen, setEditModalOpen] = useState(false);
+   const [editingItem, setEditingItem] = useState<ProcessedWatchlistItem | null>(null);
 
    // Use fetch watchlist helper
    const { fetchWatchlistData } = useFetchWatchlist(setData, setLoading);
@@ -112,6 +115,23 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
       setModalOpen(false);
       setSelectedItem(null);
    }, []);
+
+   // Handle opening edit modal
+   const handleOpenEdit = useCallback((item: ProcessedWatchlistItem) => {
+      setEditingItem(item);
+      setEditModalOpen(true);
+   }, []);
+
+   // Handle closing edit modal
+   const handleCloseEdit = useCallback(() => {
+      setEditModalOpen(false);
+      setEditingItem(null);
+   }, []);
+
+   // Handle edit success
+   const handleEditSuccess = useCallback(() => {
+      fetchWatchlistData();
+   }, [fetchWatchlistData]);
 
    // Define all columns
    const allColumns = useMemo(() => [
@@ -266,6 +286,15 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
             header: 'Actions',
             cell: info => (
                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Tooltip title="Edit">
+                     <IconButton
+                        size="small"
+                        color="warning"
+                        onClick={() => handleOpenEdit(info.row.original)}
+                     >
+                        <Edit />
+                     </IconButton>
+                  </Tooltip>
                   <Tooltip title="Delete">
                      <IconButton
                         size="small"
@@ -277,10 +306,10 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
                   </Tooltip>
                </Box>
             ),
-            size: 100,
+            size: 120,
          })
       ] : []),
-   ], [handleDelete, handleToggleWatched, handleToggleFavorite, handleOpenDetails, isAdmin]);
+   ], [handleDelete, handleToggleWatched, handleToggleFavorite, handleOpenDetails, handleOpenEdit, isAdmin]);
 
    // Use all columns (visibility is handled by columnVisibility state)
    const columns = useMemo(() => {
@@ -485,6 +514,13 @@ const WatchlistTable: React.FC<WatchlistTableProps> = ({ onRefresh, isAdmin = fa
             tmdbId={selectedItem?.tmdbId || null}
             mediaType={selectedItem?.mediaType || null}
             title={selectedItem?.title || ''}
+         />
+
+         <EditWatchlistItemModal
+            open={editModalOpen}
+            onClose={handleCloseEdit}
+            item={editingItem}
+            onSuccess={handleEditSuccess}
          />
       </Box>
    );
