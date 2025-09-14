@@ -18,64 +18,25 @@ if (process.env.NODE_ENV !== 'production') {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { 
-      tmdbId, 
-      mediaType, 
-      title, 
-      overview, 
-      posterUrl, 
-      releaseDate, 
-      rating,
-      watched = false,
-      favorite = false,
-      dateWatched,
-      userRating,
-      priority,
-      recommendedBy
-    } = body;
-
-    // Validate required fields
-    if (!tmdbId || !mediaType || !title) {
-      return NextResponse.json(
-        { error: 'Missing required fields: tmdbId, mediaType, title' },
-        { status: 400 }
-      );
-    }
-
-    // Check if item already exists in watchlist
-    const existingItem = await prisma.watchlistItem.findFirst({
-      where: {
-        tmdbId: tmdbId,
-        mediaType: mediaType,
+    
+    // Forward the request to Spring Boot backend
+    const response = await fetch('https://perpetual-watchlist-springboot.onrender.com/api/watchlist', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify(body),
     });
 
-    if (existingItem) {
-      return NextResponse.json(
-        { error: 'Item already exists in watchlist', item: existingItem },
-        { status: 409 }
-      );
+    const data = await response.json();
+    
+    if (!response.ok) {
+      return NextResponse.json(data, { status: response.status });
     }
 
-    // Add new item to watchlist
-    const newItem = await prisma.watchlistItem.create({
-      data: {
-        tmdbId,
-        mediaType,
-        title,
-        posterImage: posterUrl,
-        watched,
-        favorite,
-        dateWatched: dateWatched ? new Date(dateWatched) : null,
-        userRating,
-        priority,
-        recommendedBy,
-      },
-    });
-
-    return NextResponse.json({ success: true, item: newItem }, { status: 201 });
+    return NextResponse.json(data, { status: response.status });
   } catch (error) {
-    console.error('Error adding to watchlist:', error);
+    console.error('Error adding to watchlist via Spring Boot:', error);
     return NextResponse.json(
       { error: 'Failed to add item to watchlist' },
       { status: 500 }
@@ -83,28 +44,19 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// juhotodo we need to replace this with the new endpoint that is being hosted on Render
 export async function GET() {
   try {
-    // Ensure Prisma connection is healthy
-    await prisma.$connect();
+    const response = await fetch('https://perpetual-watchlist-springboot.onrender.com/api/watchlist');
     
-    const watchlistItems = await prisma.watchlistItem.findMany({
-      orderBy: {
-        dateAdded: 'desc',
-      },
-    });
-
-    return NextResponse.json({ items: watchlistItems });
-  } catch (error) {
-    console.error('Error fetching watchlist:', error);
-    
-    // Try to disconnect and reconnect if there's a connection issue
-    try {
-      await prisma.$disconnect();
-      await prisma.$connect();
-    } catch (connectionError) {
-      console.error('Prisma connection error:', connectionError);
+    if (!response.ok) {
+      throw new Error(`Spring Boot API error: ${response.status} ${response.statusText}`);
     }
+    
+    const data = await response.json();
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error('Error fetching watchlist from Spring Boot:', error);
     
     return NextResponse.json(
       { error: 'Failed to fetch watchlist', details: error instanceof Error ? error.message : 'Unknown error' },
